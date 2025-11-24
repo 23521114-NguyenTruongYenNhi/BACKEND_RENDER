@@ -12,7 +12,7 @@ const router = express.Router();
 /**
  * @swagger
  * tags:
- * name: Users
+ * - name: Users
  * description: User profile and favorites management
  */
 

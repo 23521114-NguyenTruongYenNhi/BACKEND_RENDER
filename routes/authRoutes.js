@@ -6,7 +6,7 @@ const router = express.Router();
 /**
  * @swagger
  * tags:
- * name: Auth
+ * - name: Auth
  * description: User authentication and registration endpoints
  */
 

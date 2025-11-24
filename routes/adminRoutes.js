@@ -19,7 +19,7 @@ router.use(admin);
 /**
  * @swagger
  * tags:
- * name: Admin
+ * - name: Admin
  * description: Administrative operations (Requires Admin privileges)
  */
 

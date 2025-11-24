@@ -15,7 +15,7 @@ const router = express.Router();
 /**
  * @swagger
  * tags:
- * name: Recipes
+ * - name: Recipes
  * description: Recipe management and retrieval endpoints
  */
 
