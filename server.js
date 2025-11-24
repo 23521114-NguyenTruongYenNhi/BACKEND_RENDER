@@ -16,15 +16,19 @@ import adminRoutes from './routes/adminRoutes.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// --- DEBUG: VERIFY ROUTE FILES ---
-console.log("🔍 Current directory (__dirname):", __dirname);
-const routesPath = path.join(__dirname, 'routes');
-if (fs.existsSync(routesPath)) {
-    console.log("✅ Routes directory found at:", routesPath);
-    console.log("📄 Files in routes:", fs.readdirSync(routesPath));
-} else {
-    console.error("❌ ERROR: Routes directory NOT found at:", routesPath);
-}
+// --- DEBUG LOGS (Check Render Logs if Swagger fails) ---
+console.log("📂 Root Directory:", __dirname);
+const routeFiles = [
+    './routes/recipeRoutes.js',
+    './routes/authRoutes.js',
+    './routes/userRoutes.js',
+    './routes/adminRoutes.js',
+    './server.js'
+];
+routeFiles.forEach(file => {
+    const fullPath = path.join(__dirname, file);
+    console.log(`Checking file: ${file} -> ${fs.existsSync(fullPath) ? '✅ Exists' : '❌ MISSING'}`);
+});
 
 // Load environment variables
 dotenv.config();
@@ -50,7 +54,6 @@ const swaggerOptions = {
         },
         servers: [
             {
-                // Update this URL with your actual Render URL
                 url: 'https://mystere-meal-api.onrender.com',
                 description: 'Production Server',
             },
@@ -60,11 +63,14 @@ const swaggerOptions = {
             },
         ],
     },
-    // CRITICAL FIX: Use path.join to create ABSOLUTE PATHS. 
-    // Relative paths (./) often fail on Cloud environments.
+    // NUCLEAR OPTION: Explicitly list every single file with ABSOLUTE PATHS.
+    // This removes any ambiguity with glob patterns (*.js) on Linux.
     apis: [
-        path.join(__dirname, 'routes/*.js'), // Scans all files in routes folder
-        path.join(__dirname, 'server.js')    // Scans this file
+        path.join(__dirname, 'routes/recipeRoutes.js'),
+        path.join(__dirname, 'routes/authRoutes.js'),
+        path.join(__dirname, 'routes/userRoutes.js'),
+        path.join(__dirname, 'routes/adminRoutes.js'),
+        path.join(__dirname, 'server.js')
     ],
 };
 
