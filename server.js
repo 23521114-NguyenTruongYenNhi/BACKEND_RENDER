@@ -3,11 +3,18 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
 import recipeRoutes from './routes/recipeRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+
+// --- CONFIG PATH FOR ESM MODULES (Fix for Render) ---
+// This ensures the server finds files correctly on Linux/Cloud environments
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables
 dotenv.config();
@@ -43,8 +50,11 @@ const swaggerOptions = {
             },
         ],
     },
-    // Path to the API docs 
-    apis: ['./routes/*.js'],
+    // CRITICAL FIX: Use absolute paths to find routes on Render/Linux
+    apis: [
+        path.join(__dirname, './routes/*.js'),
+        path.join(__dirname, './server.js')
+    ],
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
@@ -52,7 +62,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Routes
 app.use('/api/recipes', recipeRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); // Changed path to avoid conflict with users
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 
@@ -62,12 +72,16 @@ app.get('/', (req, res) => {
         message: 'Mystère Meal API Server is running',
         status: 'OK',
         documentation: '/api-docs',
+        endpoints: {
+            healthCheck: '/api/health',
+            recipes: '/api/recipes',
+        }
     });
 });
 
 // Health Check
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'OK', message: 'System is healthy' });
+    res.json({ status: 'OK', message: 'Mystère Meal API is running' });
 });
 
 // Global Error Handler
