@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs'; // Import fs to verify file existence
 import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
 import recipeRoutes from './routes/recipeRoutes.js';
@@ -11,10 +12,18 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 
-// --- CONFIG PATH FOR ESM MODULES (Fix for Render) ---
-// This ensures the server finds files correctly on Linux/Cloud environments
+// --- CONFIG PATH FOR ESM MODULES ---
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// --- DEBUG: VERIFY IF ROUTES DIRECTORY EXISTS ---
+console.log("🔍 Checking routes directory at:", path.join(__dirname, 'routes'));
+try {
+    const files = fs.readdirSync(path.join(__dirname, 'routes'));
+    console.log("✅ Found files in routes directory:", files);
+} catch (error) {
+    console.error("❌ ERROR: Could not read routes directory!", error.message);
+}
 
 // Load environment variables
 dotenv.config();
@@ -40,7 +49,7 @@ const swaggerOptions = {
         },
         servers: [
             {
-                // Update this URL with your actual Render URL after deployment
+                // Update this URL with your actual Render URL
                 url: 'https://mystere-meal-api.onrender.com',
                 description: 'Production Server',
             },
@@ -50,10 +59,13 @@ const swaggerOptions = {
             },
         ],
     },
-    // CRITICAL FIX: Use absolute paths to find routes on Render/Linux
+    // explicitly list files to ensure Swagger finds them on Linux/Render environments
     apis: [
-        path.join(__dirname, './routes/*.js'),
-        path.join(__dirname, './server.js')
+        './server.js',
+        './routes/recipeRoutes.js',
+        './routes/authRoutes.js',
+        './routes/userRoutes.js',
+        './routes/adminRoutes.js'
     ],
 };
 
@@ -62,7 +74,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Routes
 app.use('/api/recipes', recipeRoutes);
-app.use('/api/auth', authRoutes); // Changed path to avoid conflict with users
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 
@@ -72,16 +84,12 @@ app.get('/', (req, res) => {
         message: 'Mystère Meal API Server is running',
         status: 'OK',
         documentation: '/api-docs',
-        endpoints: {
-            healthCheck: '/api/health',
-            recipes: '/api/recipes',
-        }
     });
 });
 
 // Health Check
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'OK', message: 'Mystère Meal API is running' });
+    res.json({ status: 'OK', message: 'System is healthy' });
 });
 
 // Global Error Handler
