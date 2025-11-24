@@ -1,3 +1,5 @@
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -20,33 +22,58 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// --- Swagger Configuration ---
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Mystère Meal API',
+            version: '1.0.0',
+            description: 'API documentation for Mystère Meal recipe recommendation system',
+        },
+        servers: [
+            {
+                // Update this URL with your actual Render URL after deployment
+                url: 'https://mystere-meal-api.onrender.com',
+                description: 'Production Server',
+            },
+            {
+                url: 'http://localhost:5000',
+                description: 'Local Development',
+            },
+        ],
+    },
+    // Path to the API docs 
+    apis: ['./routes/*.js'],
+};
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 // Routes
 app.use('/api/recipes', recipeRoutes);
-app.use('/api/users', authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Root endpoint (Trang chào mừng)
+// Root Endpoint
 app.get('/', (req, res) => {
     res.json({
         message: 'Mystère Meal API Server is running',
         status: 'OK',
-        endpoints: {
-            healthCheck: '/api/health',
-            recipes: '/api/recipes',
-        }
+        documentation: '/api-docs',
     });
 });
 
-// Health check
+// Health Check
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'OK', message: 'Mystère Meal API is running' });
+    res.json({ status: 'OK', message: 'System is healthy' });
 });
 
-// Error handling middleware
+// Global Error Handler
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({ message: 'Something went wrong!', error: err.message });
+    res.status(500).json({ message: 'Internal Server Error', error: err.message });
 });
 
 const PORT = process.env.PORT || 5000;
