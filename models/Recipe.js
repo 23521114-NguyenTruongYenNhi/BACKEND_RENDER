@@ -1,0 +1,98 @@
+import mongoose from 'mongoose';
+
+const recipeSchema = new mongoose.Schema(
+    {
+        title: {
+            type: String,
+            required: [true, 'Recipe title is required'],
+            trim: true,
+        },
+        image: {
+            type: String,
+            default: '',
+        },
+        cuisine: {
+            type: String,
+            required: [true, 'Cuisine type is required'],
+        },
+        mealType: {
+            type: String,
+            required: [true, 'Meal type is required'],
+            enum: ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Dessert'],
+        },
+        difficulty: {
+            type: String,
+            required: [true, 'Difficulty level is required'],
+            enum: ['Easy', 'Medium', 'Hard'],
+        },
+        time: {
+            type: Number,
+            required: [true, 'Cooking time is required'],
+            min: 1,
+        },
+        rating: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: 5,
+        },
+        // --- CRITICAL FIX: STATUS DEFAULT CHANGED ---
+        status: {
+            type: String,
+            enum: ['pending', 'approved', 'rejected'],
+            default: 'pending', // FIX: Default is now 'pending' to require Admin approval workflow
+        },
+        // ------------------------------------------
+        ingredients: [
+            {
+                type: String,
+                required: true,
+            },
+        ],
+        steps: [
+            {
+                type: String,
+                required: true,
+            },
+        ],
+        nutrition: {
+            calories: { type: Number, default: 0 },
+            protein: { type: Number, default: 0 },
+            fat: { type: Number, default: 0 },
+            carbs: { type: Number, default: 0 },
+        },
+        tags: [String],
+        isVegetarian: {
+            type: Boolean,
+            default: false,
+        },
+        isVegan: {
+            type: Boolean,
+            default: false,
+        },
+        isGlutenFree: {
+            type: Boolean,
+            default: false,
+        },
+        author: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        comments: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Comment',
+            },
+        ],
+    },
+    {
+        timestamps: true,
+    }
+);
+
+// Index for search functionality
+recipeSchema.index({ ingredients: 1, cuisine: 1, mealType: 1 });
+
+const Recipe = mongoose.model('Recipe', recipeSchema);
+
+export default Recipe;
