@@ -4,7 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
-import fs from 'fs'; // Import fs to verify file existence
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
 import recipeRoutes from './routes/recipeRoutes.js';
@@ -16,13 +16,14 @@ import adminRoutes from './routes/adminRoutes.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// --- DEBUG: VERIFY IF ROUTES DIRECTORY EXISTS ---
-console.log("🔍 Checking routes directory at:", path.join(__dirname, 'routes'));
-try {
-    const files = fs.readdirSync(path.join(__dirname, 'routes'));
-    console.log("✅ Found files in routes directory:", files);
-} catch (error) {
-    console.error("❌ ERROR: Could not read routes directory!", error.message);
+// --- DEBUG: VERIFY ROUTE FILES ---
+console.log("🔍 Current directory (__dirname):", __dirname);
+const routesPath = path.join(__dirname, 'routes');
+if (fs.existsSync(routesPath)) {
+    console.log("✅ Routes directory found at:", routesPath);
+    console.log("📄 Files in routes:", fs.readdirSync(routesPath));
+} else {
+    console.error("❌ ERROR: Routes directory NOT found at:", routesPath);
 }
 
 // Load environment variables
@@ -59,13 +60,11 @@ const swaggerOptions = {
             },
         ],
     },
-    // explicitly list files to ensure Swagger finds them on Linux/Render environments
+    // CRITICAL FIX: Use path.join to create ABSOLUTE PATHS. 
+    // Relative paths (./) often fail on Cloud environments.
     apis: [
-        './server.js',
-        './routes/recipeRoutes.js',
-        './routes/authRoutes.js',
-        './routes/userRoutes.js',
-        './routes/adminRoutes.js'
+        path.join(__dirname, 'routes/*.js'), // Scans all files in routes folder
+        path.join(__dirname, 'server.js')    // Scans this file
     ],
 };
 
