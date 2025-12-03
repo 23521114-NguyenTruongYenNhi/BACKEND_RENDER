@@ -53,7 +53,6 @@ const ingredientNutritionSchema = new mongoose.Schema({
 });
 
 // Index for faster ingredient lookups
-ingredientNutritionSchema.index({ name: 1 });
 ingredientNutritionSchema.index({ aliases: 1 });
 
 // Method to get nutrition for a specific quantity

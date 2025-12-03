@@ -1,11 +1,11 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Mystère Meal API",
+    "title": "Mystere Meal API",
     "version": "1.0.0",
-    "description": "RESTful API for the Mystère Meal recipe recommendation application. This API enables users to discover recipes based on available ingredients, manage personal favorites, submit new recipes, and interact with a community-driven platform featuring ratings, comments, and nutritional information.",
+    "description": "RESTful API for the Mystere Meal recipe recommendation application. This API enables users to discover recipes based on available ingredients, manage personal favorites, submit new recipes, and interact with a community-driven platform featuring ratings, comments, and nutritional information.",
     "contact": {
-      "name": "Mystère Meal Development Team",
+      "name": "Mystere Meal Development Team",
       "email": "support@mysteremeal.com"
     },
     "license": {
@@ -19,7 +19,7 @@
       "description": "Local development server"
     },
     {
-      "url": "https://mystere-meal-api.onrender.com/api",
+      "url": "https://mystere-meal.onrender.com/api",
       "description": "Production server"
     }
   ],
