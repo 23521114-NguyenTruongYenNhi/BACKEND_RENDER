@@ -37,7 +37,8 @@ app.use(cors({
     'http://localhost:5173',
     'https://mystere-meal-frontend.vercel.app',
     'https://mystere-meal-frontend-ow6lbi1yv.vercel.app',
-    /https:\/\/mystere-meal-frontend.*\.vercel\.app/ 
+    /https:\/\/mystere-meal-frontend.*\.vercel\.app/ ,
+    'https://frontend-final-gamma.vercel.app'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
