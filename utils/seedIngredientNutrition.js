@@ -4,7 +4,6 @@ import IngredientNutrition from '../models/IngredientNutrition.js';
 import connectDB from '../config/db.js';
 
 dotenv.config();
-const MONGO_URI = "mongodb+srv://23521114_db_user:MasB80RaCs9oBB18@cluster0.qzsvxay.mongodb.net/mystere-meal?appName=Cluster0";
 
 // Helper tạo dữ liệu chuẩn xác
 const createIng = (name, cal, pro, fat, carb, unit = '100g', aliases = [], conversions = {}) => ({

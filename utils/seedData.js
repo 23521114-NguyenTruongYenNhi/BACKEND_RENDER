@@ -7,7 +7,6 @@ import Comment from '../models/Comment.js';
 dotenv.config();
 
 // Link Database của bạn
-const MONGO_URI = "mongodb+srv://23521114_db_user:MasB80RaCs9oBB18@cluster0.qzsvxay.mongodb.net/mystere-meal?appName=Cluster0";
 
 const recipesData = [
     // =================================================================
