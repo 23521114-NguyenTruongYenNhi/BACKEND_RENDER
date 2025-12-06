@@ -1,10 +1,17 @@
 ﻿import nodemailer from 'nodemailer';
 
 const sendEmail = async (options) => {
+    // --- THÊM ĐOẠN LOG NÀY ĐỂ DEBUG TRÊN RENDER ---
+    console.log("=== DEBUG EMAIL CONFIG ===");
+    console.log("HOST:", process.env.SMTP_HOST || "KHÔNG CÓ (UNDEFINED) -> Lỗi là ở đây!");
+    console.log("USER:", process.env.SMTP_EMAIL || "KHÔNG CÓ");
+    console.log("PASS:", process.env.SMTP_PASSWORD ? "Đã có pass" : "KHÔNG CÓ PASS");
+    // ----------------------------------------------
+
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
-        secure: false, // true for 465, false for other ports
+        secure: false,
         auth: {
             user: process.env.SMTP_EMAIL,
             pass: process.env.SMTP_PASSWORD,
