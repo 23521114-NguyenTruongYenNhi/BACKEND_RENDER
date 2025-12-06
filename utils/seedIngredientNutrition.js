@@ -1,11 +1,33 @@
 ﻿import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+// --- IMPORT MODEL ---
 import IngredientNutrition from '../models/IngredientNutrition.js';
 
-dotenv.config();
+// --- CẤU HÌNH LOAD FILE .ENV ---
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
+// Trỏ ngược ra thư mục cha (BACKEND) để tìm file .env
+dotenv.config({ path: join(__dirname, '../.env') });
 
-// Helper tạo dữ liệu chuẩn
+// --- KIỂM TRA DEBUG ---
+console.log("📍 Đang đọc file .env từ:", join(__dirname, '../.env'));
+
+// SỬA LẠI: Dùng đúng tên biến MONGODB_URI như trong file .env của bạn
+const dbUri = process.env.MONGODB_URI;
+
+if (!dbUri) {
+    console.error("❌ LỖI: Không tìm thấy biến MONGODB_URI. Hãy kiểm tra file .env!");
+    process.exit(1);
+} else {
+    // Ẩn bớt mật khẩu khi log để bảo mật
+    console.log("✅ Đã tìm thấy MONGODB_URI:", dbUri.substring(0, 20) + "...");
+}
+
+// --- DỮ LIỆU MẪU ---
 const createIng = (name, cal, pro, fat, carb, unit = '100g', aliases = [], conversions = {}) => ({
     name,
     caloriesPerUnit: cal,
@@ -183,9 +205,10 @@ const ingredientNutritionData = [
 const seedIngredientNutrition = async () => {
     try {
         console.log('Đang kết nối MongoDB...');
-        await mongoose.connect(MONGO_URI);
-        console.log('✅ MongoDB Connected');
 
+        await mongoose.connect(dbUri); // Dùng biến dbUri đã lấy ở trên
+
+        console.log('✅ MongoDB Connected');
         console.log('Đang nạp dữ liệu (Upsert Mode)...');
 
         const operations = ingredientNutritionData.map(item => ({
