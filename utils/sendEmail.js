@@ -1,17 +1,14 @@
 ﻿import nodemailer from 'nodemailer';
 
 const sendEmail = async (options) => {
-    // --- THÊM ĐOẠN LOG NÀY ĐỂ DEBUG TRÊN RENDER ---
+    // Debug log để xem cấu hình
     console.log("=== DEBUG EMAIL CONFIG ===");
-    console.log("HOST:", process.env.SMTP_HOST || "KHÔNG CÓ (UNDEFINED) -> Lỗi là ở đây!");
-    console.log("USER:", process.env.SMTP_EMAIL || "KHÔNG CÓ");
-    console.log("PASS:", process.env.SMTP_PASSWORD ? "Đã có pass" : "KHÔNG CÓ PASS");
-    // ----------------------------------------------
+    console.log("SMTP_EMAIL:", process.env.SMTP_EMAIL);
 
+    // CÁCH FIX MỚI: Dùng service: 'gmail' thay vì host/port thủ công
+    // Cách này giúp Nodemailer tự động xử lý các vấn đề về cổng và timeout
     const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        secure: false,
+        service: 'gmail',
         auth: {
             user: process.env.SMTP_EMAIL,
             pass: process.env.SMTP_PASSWORD,
@@ -25,7 +22,8 @@ const sendEmail = async (options) => {
         html: options.html,
     };
 
-    await transporter.sendMail(message);
+    const info = await transporter.sendMail(message);
+    console.log("Message sent: %s", info.messageId);
 };
 
 export default sendEmail;
