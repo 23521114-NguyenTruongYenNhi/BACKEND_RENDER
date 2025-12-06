@@ -1,104 +1,112 @@
-﻿import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
-import sendEmail from '../utils/sendEmail.js'; // Đảm bảo bạn đã có file này
+﻿import User from '../models/User.js'; // Kiểm tra lại đường dẫn model User của bạn
+// Nếu có file ErrorResponse hoặc asyncHandler thì import vào, ở đây tôi viết try-catch cơ bản cho an toàn
 
-// Generate JWT Token
-const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET || 'your-secret-key', {
-        expiresIn: '30d',
-    });
-};
-
-// @desc    Register new user
-// @route   POST /api/users/signup
+// @desc    Register user
+// @route   POST /api/auth/register
 // @access  Public
-export const signup = async (req, res) => {
+export const register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        // Check if user exists
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            return res.status(400).json({ message: 'User already exists' });
-        }
-
-        // Create user
+        // 1. Tạo user (Mongoose sẽ tự hash password nếu trong Model bạn đã cấu hình pre-save hook)
         const user = await User.create({
             name,
             email,
             password,
         });
 
-        if (user) {
-            // --- BẮT ĐẦU ĐOẠN CODE GỬI EMAIL ---
-            console.log("1. Đã tạo user thành công, bắt đầu gửi mail..."); // Log kiểm tra
+        // 2. Trả về Token luôn (Không gửi mail nữa)
+        sendTokenResponse(user, 200, res);
 
-            try {
-                await sendEmail({
-                    email: user.email,
-                    subject: 'Welcome to Mystere Meal',
-                    html: `
-                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-                            <h2 style="color: #ea580c;">Welcome ${user.name}!</h2>
-                            <p>Thank you for registering with Mystere Meal.</p>
-                            <p>Your account has been successfully created. You can now log in and start exploring recipes.</p>
-                            
-                            <div style="margin-top: 20px;">
-                                <p><strong>Your Account Email:</strong> ${user.email}</p>
-                            </div>
-
-                            <div style="margin-top: 30px;">
-                                <a href="${process.env.CLIENT_URL || 'https://frontend-final-deploy-delta.vercel.app'}" 
-                                   style="background-color: #ea580c; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-                                   Visit Website
-                                </a>
-                            </div>
-                        </div>
-                    `
-                });
-                console.log("2. Đã gửi email thành công!"); // Nếu thấy dòng này là mail đã đi
-            } catch (emailError) {
-                console.error("3. LỖI GỬI EMAIL:", emailError); // Nếu thấy dòng này, hãy chụp ảnh lỗi gửi mình
-            }
-            // --- KẾT THÚC ĐOẠN CODE GỬI EMAIL ---
-
-            res.status(201).json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                isAdmin: user.isAdmin,
-                isLocked: user.isLocked,
-                token: generateToken(user._id),
-            });
+    } catch (err) {
+        // Xử lý lỗi trùng email (Duplicate key error code: 11000)
+        if (err.code === 11000) {
+            return res.status(400).json({ success: false, error: 'Email đã tồn tại' });
         }
-    } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ success: false, error: err.message });
     }
 };
 
 // @desc    Login user
-// @route   POST /api/users/login
+// @route   POST /api/auth/login
 // @access  Public
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Find user by email
-        const user = await User.findOne({ email });
+        // 1. Validate email & password
+        if (!email || !password) {
+            return res.status(400).json({ success: false, error: 'Vui lòng nhập email và mật khẩu' });
+        }
 
-        if (user && (await user.matchPassword(password))) {
-            res.json({
-                _id: user._id,
+        // 2. Check for user (cần lấy cả password để so sánh)
+        const user = await User.findOne({ email }).select('+password');
+
+        if (!user) {
+            return res.status(401).json({ success: false, error: 'Thông tin đăng nhập không đúng' });
+        }
+
+        // 3. Check if password matches
+        // (Giả định trong Model User bạn có phương thức matchPassword)
+        const isMatch = await user.matchPassword(password);
+
+        if (!isMatch) {
+            return res.status(401).json({ success: false, error: 'Thông tin đăng nhập không đúng' });
+        }
+
+        // 4. Trả về token
+        sendTokenResponse(user, 200, res);
+
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
+// @desc    Get current Logged in user
+// @route   POST /api/auth/me
+// @access  Private
+export const getMe = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        res.status(200).json({
+            success: true,
+            data: user,
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
+// --- Helper Function: Get token from model, create cookie and send response ---
+const sendTokenResponse = (user, statusCode, res) => {
+    // Gọi method getSignedJwtToken từ User Model
+    const token = user.getSignedJwtToken();
+
+    const options = {
+        expires: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+        ),
+        httpOnly: true,
+    };
+
+    // Nếu chạy trên production (Render) thì bật secure để dùng https
+    if (process.env.NODE_ENV === 'production') {
+        options.secure = true;
+    }
+
+    res
+        .status(statusCode)
+        .cookie('token', token, options)
+        .json({
+            success: true,
+            token,
+            // Có thể trả thêm info user cơ bản để Frontend dùng luôn
+            user: {
+                id: user._id,
                 name: user.name,
                 email: user.email,
-                isAdmin: user.isAdmin,
-                isLocked: user.isLocked,
-                token: generateToken(user._id),
-            });
-        } else {
-            res.status(401).json({ message: 'Invalid email or password' });
-        }
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
+                role: user.role
+            }
+        });
 };
