@@ -1,6 +1,6 @@
-import jwt from 'jsonwebtoken';
+﻿import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
-import sendEmail from '../utils/sendEmail.js';
+import sendEmail from '../utils/sendEmail.js'; // Đảm bảo bạn đã có file này
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -30,14 +30,16 @@ export const signup = async (req, res) => {
         });
 
         if (user) {
-            // Send Welcome Email
+            // --- BẮT ĐẦU ĐOẠN CODE GỬI EMAIL ---
+            console.log("1. Đã tạo user thành công, bắt đầu gửi mail..."); // Log kiểm tra
+
             try {
                 await sendEmail({
                     email: user.email,
                     subject: 'Welcome to Mystere Meal',
                     html: `
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-                            <h2 style="color: #ea580c;">Welcome ${user.name}</h2>
+                            <h2 style="color: #ea580c;">Welcome ${user.name}!</h2>
                             <p>Thank you for registering with Mystere Meal.</p>
                             <p>Your account has been successfully created. You can now log in and start exploring recipes.</p>
                             
@@ -46,7 +48,7 @@ export const signup = async (req, res) => {
                             </div>
 
                             <div style="margin-top: 30px;">
-                                <a href="${process.env.CLIENT_URL || 'http://localhost:3000'}" 
+                                <a href="${process.env.CLIENT_URL || 'https://frontend-final-deploy-delta.vercel.app'}" 
                                    style="background-color: #ea580c; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
                                    Visit Website
                                 </a>
@@ -54,10 +56,11 @@ export const signup = async (req, res) => {
                         </div>
                     `
                 });
+                console.log("2. Đã gửi email thành công!"); // Nếu thấy dòng này là mail đã đi
             } catch (emailError) {
-                // Log the error but do not stop the registration process
-                console.error("Email sending failed:", emailError);
+                console.error("3. LỖI GỬI EMAIL:", emailError); // Nếu thấy dòng này, hãy chụp ảnh lỗi gửi mình
             }
+            // --- KẾT THÚC ĐOẠN CODE GỬI EMAIL ---
 
             res.status(201).json({
                 _id: user._id,
