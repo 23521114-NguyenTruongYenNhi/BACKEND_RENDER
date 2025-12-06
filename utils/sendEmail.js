@@ -1,39 +1,32 @@
-﻿const nodemailer = require("nodemailer");
+﻿import nodemailer from 'nodemailer'; // Đổi từ require sang import
 
 const sendEmail = async (options) => {
     // 1. Khởi tạo Transporter
     const transporter = nodemailer.createTransport({
-        // Sử dụng service 'gmail' tự động cấu hình host là smtp.gmail.com
         service: "gmail",
-
-        // Cấu hình Port và Bảo mật (Quan trọng cho Render)
         host: "smtp.gmail.com",
         port: 465,
-        secure: true, // true cho port 465, false cho các port khác
-
-        // Thông tin xác thực
+        secure: true,
         auth: {
             user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS, // Đây phải là App Password (Mật khẩu ứng dụng)
+            pass: process.env.EMAIL_PASS,
         },
-
-        // --- CẤU HÌNH FIX LỖI TIMEOUT TRÊN RENDER ---
+        // Fix lỗi Render
         tls: {
-            rejectUnauthorized: false, // Bỏ qua lỗi SSL (nếu có)
+            rejectUnauthorized: false,
         },
-        family: 4, // QUAN TRỌNG: Ép buộc dùng IPv4 để tránh lỗi timeout IPv6 trên Cloud
-        connectionTimeout: 10000, // Timeout kết nối: 10 giây
-        greetingTimeout: 5000,    // Timeout chờ phản hồi từ server mail: 5 giây
-        // ---------------------------------------------
+        family: 4,
+        connectionTimeout: 10000,
+        greetingTimeout: 5000,
     });
 
     // 2. Cấu hình nội dung email
     const mailOptions = {
-        from: `"Mystère Meal Support" <${process.env.EMAIL_USER}>`, // Tên người gửi
-        to: options.email, // Email người nhận
-        subject: options.subject, // Tiêu đề
-        text: options.message, // Nội dung dạng text
-        html: options.html, // Nội dung dạng HTML (nếu có)
+        from: `"Mystère Meal Support" <${process.env.EMAIL_USER}>`,
+        to: options.email,
+        subject: options.subject,
+        text: options.message,
+        html: options.html,
     };
 
     // 3. Gửi mail
@@ -43,8 +36,8 @@ const sendEmail = async (options) => {
         return info;
     } catch (error) {
         console.error("Lỗi chi tiết khi gửi mail:", error);
-        throw new Error("Email could not be sent"); // Ném lỗi ra để Controller bắt được
+        throw new Error("Email could not be sent");
     }
 };
 
-module.exports = sendEmail;
+export default sendEmail; // Đổi từ module.exports sang export default
