@@ -4,653 +4,185 @@ import IngredientNutrition from '../models/IngredientNutrition.js';
 import connectDB from '../config/db.js';
 
 dotenv.config();
+const MONGO_URI = "mongodb+srv://23521114_db_user:MasB80RaCs9oBB18@cluster0.qzsvxay.mongodb.net/mystere-meal?appName=Cluster0";
 
-// Comprehensive ingredient nutrition data (per 100g unless specified)
+// Helper tạo dữ liệu chuẩn xác
+const createIng = (name, cal, pro, fat, carb, unit = '100g', aliases = [], conversions = {}) => ({
+    name,
+    caloriesPerUnit: cal,
+    proteinPerUnit: pro,
+    fatPerUnit: fat,
+    carbsPerUnit: carb,
+    standardUnit: unit,
+    // Tự động thêm tên chính nó vào alias và xóa trùng lặp
+    aliases: [...new Set([...aliases, name, name.toLowerCase()])],
+    // Các đơn vị đo lường mặc định
+    conversions: {
+        'g': 0.01,
+        'kg': 10,
+        'oz': 0.2835,
+        'lb': 4.53,
+        ...conversions
+    }
+});
+
 const ingredientNutritionData = [
-  // Grains & Pasta
-  {
-    name: 'spaghetti',
-    caloriesPerUnit: 371,
-    proteinPerUnit: 13,
-    fatPerUnit: 1.5,
-    carbsPerUnit: 75,
-    standardUnit: '100g',
-    aliases: ['pasta', 'noodles'],
-    conversions: { 'g': 0.01, 'cup': 1.4 }
-  },
-  {
-    name: 'rice noodles',
-    caloriesPerUnit: 109,
-    proteinPerUnit: 1.8,
-    fatPerUnit: 0.2,
-    carbsPerUnit: 25,
-    standardUnit: '100g',
-    aliases: ['rice vermicelli', 'bánh phở'],
-    conversions: { 'g': 0.01, 'cup': 1.76 }
-  },
-  {
-    name: 'flour',
-    caloriesPerUnit: 364,
-    proteinPerUnit: 10,
-    fatPerUnit: 1,
-    carbsPerUnit: 76,
-    standardUnit: '100g',
-    aliases: ['all-purpose flour', 'wheat flour'],
-    conversions: { 'g': 0.01, 'cup': 1.25 }
-  },
-  {
-    name: 'quinoa',
-    caloriesPerUnit: 120,
-    proteinPerUnit: 4.4,
-    fatPerUnit: 1.9,
-    carbsPerUnit: 21,
-    standardUnit: '100g',
-    aliases: ['quinoa grain'],
-    conversions: { 'g': 0.01, 'cup': 1.85 }
-  },
-  
-  // Proteins
-  {
-    name: 'chicken breast',
-    caloriesPerUnit: 165,
-    proteinPerUnit: 31,
-    fatPerUnit: 3.6,
-    carbsPerUnit: 0,
-    standardUnit: '100g',
-    aliases: ['chicken', 'chicken meat'],
-    conversions: { 'g': 0.01, 'oz': 0.28 }
-  },
-  {
-    name: 'beef sirloin',
-    caloriesPerUnit: 271,
-    proteinPerUnit: 27,
-    fatPerUnit: 17,
-    carbsPerUnit: 0,
-    standardUnit: '100g',
-    aliases: ['beef', 'steak'],
-    conversions: { 'g': 0.01, 'oz': 0.28 }
-  },
-  {
-    name: 'ground beef',
-    caloriesPerUnit: 250,
-    proteinPerUnit: 26,
-    fatPerUnit: 15,
-    carbsPerUnit: 0,
-    standardUnit: '100g',
-    aliases: ['minced beef'],
-    conversions: { 'g': 0.01, 'oz': 0.28, 'lb': 4.54 }
-  },
-  {
-    name: 'pork shoulder',
-    caloriesPerUnit: 242,
-    proteinPerUnit: 20,
-    fatPerUnit: 17,
-    carbsPerUnit: 0,
-    standardUnit: '100g',
-    aliases: ['pork', 'pork meat'],
-    conversions: { 'g': 0.01, 'oz': 0.28 }
-  },
-  {
-    name: 'shrimp',
-    caloriesPerUnit: 99,
-    proteinPerUnit: 24,
-    fatPerUnit: 0.3,
-    carbsPerUnit: 0.2,
-    standardUnit: '100g',
-    aliases: ['prawn', 'shrimps'],
-    conversions: { 'g': 0.01, 'oz': 0.28, 'piece': 0.15 }
-  },
-  {
-    name: 'tofu',
-    caloriesPerUnit: 76,
-    proteinPerUnit: 8,
-    fatPerUnit: 4.8,
-    carbsPerUnit: 1.9,
-    standardUnit: '100g',
-    aliases: ['bean curd'],
-    conversions: { 'g': 0.01, 'oz': 0.28, 'cup': 2.52 }
-  },
-  {
-    name: 'eggs',
-    caloriesPerUnit: 155,
-    proteinPerUnit: 13,
-    fatPerUnit: 11,
-    carbsPerUnit: 1.1,
-    standardUnit: '100g',
-    aliases: ['egg'],
-    conversions: { 'g': 0.01, 'whole': 0.5, 'large': 0.5 }
-  },
-  {
-    name: 'chickpeas',
-    caloriesPerUnit: 164,
-    proteinPerUnit: 8.9,
-    fatPerUnit: 2.6,
-    carbsPerUnit: 27,
-    standardUnit: '100g',
-    aliases: ['garbanzo beans', 'chana'],
-    conversions: { 'g': 0.01, 'cup': 1.64 }
-  },
-  
-  // Dairy
-  {
-    name: 'mozzarella',
-    caloriesPerUnit: 280,
-    proteinPerUnit: 28,
-    fatPerUnit: 17,
-    carbsPerUnit: 3.1,
-    standardUnit: '100g',
-    aliases: ['mozzarella cheese'],
-    conversions: { 'g': 0.01, 'oz': 0.28, 'cup': 1.13 }
-  },
-  {
-    name: 'parmesan',
-    caloriesPerUnit: 431,
-    proteinPerUnit: 38,
-    fatPerUnit: 29,
-    carbsPerUnit: 4.1,
-    standardUnit: '100g',
-    aliases: ['parmesan cheese', 'parmigiano'],
-    conversions: { 'g': 0.01, 'oz': 0.28, 'tbsp': 0.05 }
-  },
-  {
-    name: 'pecorino romano cheese',
-    caloriesPerUnit: 387,
-    proteinPerUnit: 32,
-    fatPerUnit: 27,
-    carbsPerUnit: 3.6,
-    standardUnit: '100g',
-    aliases: ['pecorino', 'romano cheese'],
-    conversions: { 'g': 0.01, 'oz': 0.28 }
-  },
-  {
-    name: 'feta cheese',
-    caloriesPerUnit: 264,
-    proteinPerUnit: 14,
-    fatPerUnit: 21,
-    carbsPerUnit: 4.1,
-    standardUnit: '100g',
-    aliases: ['feta'],
-    conversions: { 'g': 0.01, 'oz': 0.28, 'cup': 1.5 }
-  },
-  {
-    name: 'yogurt',
-    caloriesPerUnit: 59,
-    proteinPerUnit: 10,
-    fatPerUnit: 0.4,
-    carbsPerUnit: 3.6,
-    standardUnit: '100g',
-    aliases: ['plain yogurt'],
-    conversions: { 'g': 0.01, 'ml': 0.01, 'cup': 2.45 }
-  },
-  {
-    name: 'heavy cream',
-    caloriesPerUnit: 345,
-    proteinPerUnit: 2.1,
-    fatPerUnit: 37,
-    carbsPerUnit: 2.8,
-    standardUnit: '100ml',
-    aliases: ['cream', 'whipping cream'],
-    conversions: { 'ml': 0.01, 'cup': 2.38, 'tbsp': 0.15 }
-  },
-  
-  // Vegetables
-  {
-    name: 'tomato',
-    caloriesPerUnit: 18,
-    proteinPerUnit: 0.9,
-    fatPerUnit: 0.2,
-    carbsPerUnit: 3.9,
-    standardUnit: '100g',
-    aliases: ['tomatoes'],
-    conversions: { 'g': 0.01, 'whole': 1.23, 'cup': 1.49 }
-  },
-  {
-    name: 'onions',
-    caloriesPerUnit: 40,
-    proteinPerUnit: 1.1,
-    fatPerUnit: 0.1,
-    carbsPerUnit: 9.3,
-    standardUnit: '100g',
-    aliases: ['onion', 'yellow onion'],
-    conversions: { 'g': 0.01, 'whole': 1.1, 'cup': 1.6 }
-  },
-  {
-    name: 'garlic',
-    caloriesPerUnit: 149,
-    proteinPerUnit: 6.4,
-    fatPerUnit: 0.5,
-    carbsPerUnit: 33,
-    standardUnit: '100g',
-    aliases: ['garlic cloves'],
-    conversions: { 'g': 0.01, 'cloves': 0.03, 'tsp': 0.03 }
-  },
-  {
-    name: 'bell pepper',
-    caloriesPerUnit: 20,
-    proteinPerUnit: 0.9,
-    fatPerUnit: 0.2,
-    carbsPerUnit: 4.6,
-    standardUnit: '100g',
-    aliases: ['sweet pepper', 'capsicum'],
-    conversions: { 'g': 0.01, 'whole': 1.64, 'cup': 1.49 }
-  },
-  {
-    name: 'carrot',
-    caloriesPerUnit: 41,
-    proteinPerUnit: 0.9,
-    fatPerUnit: 0.2,
-    carbsPerUnit: 10,
-    standardUnit: '100g',
-    aliases: ['carrots'],
-    conversions: { 'g': 0.01, 'whole': 0.61, 'cup': 1.28 }
-  },
-  {
-    name: 'cucumber',
-    caloriesPerUnit: 15,
-    proteinPerUnit: 0.7,
-    fatPerUnit: 0.1,
-    carbsPerUnit: 3.6,
-    standardUnit: '100g',
-    aliases: [],
-    conversions: { 'g': 0.01, 'whole': 3.01 }
-  },
-  {
-    name: 'lettuce',
-    caloriesPerUnit: 15,
-    proteinPerUnit: 1.4,
-    fatPerUnit: 0.2,
-    carbsPerUnit: 2.9,
-    standardUnit: '100g',
-    aliases: ['romaine lettuce', 'salad greens'],
-    conversions: { 'g': 0.01, 'cup': 0.47 }
-  },
-  {
-    name: 'broccoli',
-    caloriesPerUnit: 34,
-    proteinPerUnit: 2.8,
-    fatPerUnit: 0.4,
-    carbsPerUnit: 7,
-    standardUnit: '100g',
-    aliases: [],
-    conversions: { 'g': 0.01, 'cup': 0.91 }
-  },
-  {
-    name: 'kale',
-    caloriesPerUnit: 49,
-    proteinPerUnit: 4.3,
-    fatPerUnit: 0.9,
-    carbsPerUnit: 9,
-    standardUnit: '100g',
-    aliases: ['curly kale'],
-    conversions: { 'g': 0.01, 'cup': 0.67 }
-  },
-  {
-    name: 'sweet potato',
-    caloriesPerUnit: 86,
-    proteinPerUnit: 1.6,
-    fatPerUnit: 0.1,
-    carbsPerUnit: 20,
-    standardUnit: '100g',
-    aliases: ['sweet potatoes', 'yam'],
-    conversions: { 'g': 0.01, 'whole': 1.3, 'cup': 1.33 }
-  },
-  {
-    name: 'mushrooms',
-    caloriesPerUnit: 22,
-    proteinPerUnit: 3.1,
-    fatPerUnit: 0.3,
-    carbsPerUnit: 3.3,
-    standardUnit: '100g',
-    aliases: ['button mushrooms', 'white mushrooms'],
-    conversions: { 'g': 0.01, 'cup': 0.7 }
-  },
-  {
-    name: 'bean sprouts',
-    caloriesPerUnit: 30,
-    proteinPerUnit: 3,
-    fatPerUnit: 0.2,
-    carbsPerUnit: 6,
-    standardUnit: '100g',
-    aliases: ['mung bean sprouts'],
-    conversions: { 'g': 0.01, 'cup': 1.04 }
-  },
-  {
-    name: 'ginger',
-    caloriesPerUnit: 80,
-    proteinPerUnit: 1.8,
-    fatPerUnit: 0.8,
-    carbsPerUnit: 18,
-    standardUnit: '100g',
-    aliases: ['fresh ginger'],
-    conversions: { 'g': 0.01, 'tbsp': 0.06, 'tsp': 0.02 }
-  },
-  
-  // Fruits
-  {
-    name: 'lemon',
-    caloriesPerUnit: 29,
-    proteinPerUnit: 1.1,
-    fatPerUnit: 0.3,
-    carbsPerUnit: 9.3,
-    standardUnit: '100g',
-    aliases: ['lemons'],
-    conversions: { 'g': 0.01, 'whole': 0.58, 'juice': 0.48 }
-  },
-  {
-    name: 'lime',
-    caloriesPerUnit: 30,
-    proteinPerUnit: 0.7,
-    fatPerUnit: 0.2,
-    carbsPerUnit: 11,
-    standardUnit: '100g',
-    aliases: ['limes'],
-    conversions: { 'g': 0.01, 'whole': 0.67 }
-  },
-  {
-    name: 'avocado',
-    caloriesPerUnit: 160,
-    proteinPerUnit: 2,
-    fatPerUnit: 15,
-    carbsPerUnit: 9,
-    standardUnit: '100g',
-    aliases: ['avocados'],
-    conversions: { 'g': 0.01, 'whole': 2.01 }
-  },
-  {
-    name: 'pineapple',
-    caloriesPerUnit: 50,
-    proteinPerUnit: 0.5,
-    fatPerUnit: 0.1,
-    carbsPerUnit: 13,
-    standardUnit: '100g',
-    aliases: [],
-    conversions: { 'g': 0.01, 'cup': 1.65 }
-  },
-  
-  // Herbs & Aromatics
-  {
-    name: 'basil',
-    caloriesPerUnit: 23,
-    proteinPerUnit: 3.2,
-    fatPerUnit: 0.6,
-    carbsPerUnit: 2.7,
-    standardUnit: '100g',
-    aliases: ['fresh basil', 'sweet basil'],
-    conversions: { 'g': 0.01, 'bunch': 0.25, 'cup': 0.21 }
-  },
-  {
-    name: 'cilantro',
-    caloriesPerUnit: 23,
-    proteinPerUnit: 2.1,
-    fatPerUnit: 0.5,
-    carbsPerUnit: 3.7,
-    standardUnit: '100g',
-    aliases: ['coriander', 'chinese parsley'],
-    conversions: { 'g': 0.01, 'bunch': 0.28, 'cup': 0.16 }
-  },
-  {
-    name: 'thyme',
-    caloriesPerUnit: 101,
-    proteinPerUnit: 5.6,
-    fatPerUnit: 1.7,
-    carbsPerUnit: 24,
-    standardUnit: '100g',
-    aliases: ['fresh thyme'],
-    conversions: { 'g': 0.01, 'sprig': 0.007, 'tsp': 0.008 }
-  },
-  
-  // Meats
-  {
-    name: 'guanciale',
-    caloriesPerUnit: 655,
-    proteinPerUnit: 9,
-    fatPerUnit: 69,
-    carbsPerUnit: 0,
-    standardUnit: '100g',
-    aliases: ['cured pork jowl'],
-    conversions: { 'g': 0.01, 'oz': 0.28 }
-  },
-  {
-    name: 'bacon',
-    caloriesPerUnit: 541,
-    proteinPerUnit: 37,
-    fatPerUnit: 42,
-    carbsPerUnit: 1.4,
-    standardUnit: '100g',
-    aliases: ['smoked bacon'],
-    conversions: { 'g': 0.01, 'oz': 0.28, 'strip': 0.1 }
-  },
-  
-  // Condiments & Oils
-  {
-    name: 'olive oil',
-    caloriesPerUnit: 884,
-    proteinPerUnit: 0,
-    fatPerUnit: 100,
-    carbsPerUnit: 0,
-    standardUnit: '100ml',
-    aliases: ['extra virgin olive oil'],
-    conversions: { 'ml': 0.01, 'tbsp': 0.15, 'tsp': 0.05 }
-  },
-  {
-    name: 'sesame oil',
-    caloriesPerUnit: 884,
-    proteinPerUnit: 0,
-    fatPerUnit: 100,
-    carbsPerUnit: 0,
-    standardUnit: '100ml',
-    aliases: ['toasted sesame oil'],
-    conversions: { 'ml': 0.01, 'tbsp': 0.15, 'tsp': 0.05 }
-  },
-  {
-    name: 'soy sauce',
-    caloriesPerUnit: 53,
-    proteinPerUnit: 6,
-    fatPerUnit: 0.1,
-    carbsPerUnit: 4.9,
-    standardUnit: '100ml',
-    aliases: ['shoyu', 'light soy sauce'],
-    conversions: { 'ml': 0.01, 'tbsp': 0.18, 'tsp': 0.06 }
-  },
-  {
-    name: 'fish sauce',
-    caloriesPerUnit: 35,
-    proteinPerUnit: 5.1,
-    fatPerUnit: 0.1,
-    carbsPerUnit: 3.6,
-    standardUnit: '100ml',
-    aliases: ['nam pla', 'nuoc mam'],
-    conversions: { 'ml': 0.01, 'tbsp': 0.15 }
-  },
-  {
-    name: 'tomato sauce',
-    caloriesPerUnit: 24,
-    proteinPerUnit: 1.3,
-    fatPerUnit: 0.2,
-    carbsPerUnit: 5.3,
-    standardUnit: '100ml',
-    aliases: ['tomato puree', 'passata'],
-    conversions: { 'ml': 0.01, 'cup': 2.45 }
-  },
-  {
-    name: 'vinegar',
-    caloriesPerUnit: 18,
-    proteinPerUnit: 0,
-    fatPerUnit: 0,
-    carbsPerUnit: 0.04,
-    standardUnit: '100ml',
-    aliases: ['white vinegar', 'distilled vinegar'],
-    conversions: { 'ml': 0.01, 'tbsp': 0.15, 'tsp': 0.05 }
-  },
-  {
-    name: 'tamarind paste',
-    caloriesPerUnit: 239,
-    proteinPerUnit: 2.8,
-    fatPerUnit: 0.6,
-    carbsPerUnit: 63,
-    standardUnit: '100g',
-    aliases: ['tamarind concentrate'],
-    conversions: { 'g': 0.01, 'tbsp': 0.16 }
-  },
-  {
-    name: 'hummus',
-    caloriesPerUnit: 166,
-    proteinPerUnit: 8,
-    fatPerUnit: 10,
-    carbsPerUnit: 14,
-    standardUnit: '100g',
-    aliases: ['houmous'],
-    conversions: { 'g': 0.01, 'cup': 2.46, 'tbsp': 0.15 }
-  },
-  {
-    name: 'tahini',
-    caloriesPerUnit: 595,
-    proteinPerUnit: 17,
-    fatPerUnit: 54,
-    carbsPerUnit: 21,
-    standardUnit: '100g',
-    aliases: ['sesame paste'],
-    conversions: { 'g': 0.01, 'tbsp': 0.15 }
-  },
-  
-  // Spices (per tsp ~ 2g, normalized to 100g)
-  {
-    name: 'salt',
-    caloriesPerUnit: 0,
-    proteinPerUnit: 0,
-    fatPerUnit: 0,
-    carbsPerUnit: 0,
-    standardUnit: '100g',
-    aliases: ['table salt', 'sea salt'],
-    conversions: { 'g': 0.01, 'tsp': 0.06, 'tbsp': 0.18 }
-  },
-  {
-    name: 'black pepper',
-    caloriesPerUnit: 251,
-    proteinPerUnit: 10,
-    fatPerUnit: 3.3,
-    carbsPerUnit: 64,
-    standardUnit: '100g',
-    aliases: ['ground black pepper', 'pepper'],
-    conversions: { 'g': 0.01, 'tsp': 0.023 }
-  },
-  {
-    name: 'paprika',
-    caloriesPerUnit: 282,
-    proteinPerUnit: 14,
-    fatPerUnit: 13,
-    carbsPerUnit: 54,
-    standardUnit: '100g',
-    aliases: ['ground paprika'],
-    conversions: { 'g': 0.01, 'tsp': 0.022 }
-  },
-  {
-    name: 'cumin',
-    caloriesPerUnit: 375,
-    proteinPerUnit: 18,
-    fatPerUnit: 22,
-    carbsPerUnit: 44,
-    standardUnit: '100g',
-    aliases: ['ground cumin'],
-    conversions: { 'g': 0.01, 'tsp': 0.021 }
-  },
-  {
-    name: 'turmeric',
-    caloriesPerUnit: 354,
-    proteinPerUnit: 8,
-    fatPerUnit: 10,
-    carbsPerUnit: 65,
-    standardUnit: '100g',
-    aliases: ['ground turmeric'],
-    conversions: { 'g': 0.01, 'tsp': 0.022 }
-  },
-  {
-    name: 'garam masala',
-    caloriesPerUnit: 379,
-    proteinPerUnit: 14,
-    fatPerUnit: 15,
-    carbsPerUnit: 51,
-    standardUnit: '100g',
-    aliases: ['indian spice mix'],
-    conversions: { 'g': 0.01, 'tsp': 0.019 }
-  },
-  {
-    name: 'oregano',
-    caloriesPerUnit: 265,
-    proteinPerUnit: 9,
-    fatPerUnit: 4.3,
-    carbsPerUnit: 69,
-    standardUnit: '100g',
-    aliases: ['dried oregano'],
-    conversions: { 'g': 0.01, 'tsp': 0.01 }
-  },
-  
-  // Others
-  {
-    name: 'beef bones',
-    caloriesPerUnit: 50,
-    proteinPerUnit: 8,
-    fatPerUnit: 2,
-    carbsPerUnit: 0,
-    standardUnit: '100g',
-    aliases: ['beef marrow bones'],
-    conversions: { 'g': 0.01, 'kg': 10 }
-  },
-  {
-    name: 'star anise',
-    caloriesPerUnit: 337,
-    proteinPerUnit: 18,
-    fatPerUnit: 16,
-    carbsPerUnit: 50,
-    standardUnit: '100g',
-    aliases: ['whole star anise'],
-    conversions: { 'g': 0.01, 'pieces': 0.03 }
-  },
-  {
-    name: 'cinnamon stick',
-    caloriesPerUnit: 247,
-    proteinPerUnit: 4,
-    fatPerUnit: 1.2,
-    carbsPerUnit: 81,
-    standardUnit: '100g',
-    aliases: ['cinnamon', 'cassia'],
-    conversions: { 'g': 0.01, 'piece': 0.025 }
-  },
-  {
-    name: 'peanuts',
-    caloriesPerUnit: 567,
-    proteinPerUnit: 26,
-    fatPerUnit: 49,
-    carbsPerUnit: 16,
-    standardUnit: '100g',
-    aliases: ['roasted peanuts', 'groundnuts'],
-    conversions: { 'g': 0.01, 'cup': 1.46 }
-  }
+    // =================================================================
+    // 1. RAU CỦ & NẤM (VEGETABLES & MUSHROOMS)
+    // =================================================================
+    createIng('onion', 40, 1.1, 0.1, 9, '100g', ['hành tây'], { 'whole': 1.1, 'medium': 1.1, 'cup': 1.6 }),
+    createIng('garlic', 149, 6.4, 0.5, 33, '100g', ['tỏi'], { 'clove': 0.03, 'bulb': 0.3 }),
+    createIng('carrot', 41, 0.9, 0.2, 10, '100g', ['cà rốt'], { 'medium': 0.61, 'cup': 1.28 }),
+    createIng('potato', 77, 2, 0.1, 17, '100g', ['khoai tây'], { 'medium': 1.5, 'cup': 1.5 }),
+    createIng('sweet potato', 86, 1.6, 0.1, 20, '100g', ['khoai lang'], { 'medium': 1.3 }),
+    createIng('tomato', 18, 0.9, 0.2, 3.9, '100g', ['cà chua'], { 'medium': 1.23, 'cup': 1.8 }),
+    createIng('cucumber', 15, 0.7, 0.1, 3.6, '100g', ['dưa leo'], { 'medium': 2.0, 'cup': 1.2 }),
+    createIng('bell pepper', 20, 0.9, 0.2, 4.6, '100g', ['ớt chuông'], { 'medium': 1.2, 'cup': 1.5 }),
+    createIng('broccoli', 34, 2.8, 0.4, 7, '100g', ['súp lơ xanh'], { 'head': 4.0, 'cup': 0.9 }),
+    createIng('cauliflower', 25, 1.9, 0.3, 5, '100g', ['súp lơ trắng'], { 'head': 5.0, 'cup': 1.0 }),
+    createIng('spinach', 23, 2.9, 0.4, 3.6, '100g', ['cải bó xôi', 'rau chân vịt'], { 'cup': 0.3, 'bag': 2.5 }),
+    createIng('kale', 49, 4.3, 0.9, 9, '100g', ['cải xoăn'], { 'cup': 0.67 }),
+    createIng('lettuce', 15, 1.4, 0.2, 2.9, '100g', ['xà lách'], { 'head': 3.0, 'cup': 0.4 }),
+    createIng('cabbage', 25, 1.3, 0.1, 6, '100g', ['bắp cải'], { 'head': 9.0, 'cup': 0.9 }),
+    createIng('bok choy', 13, 1.5, 0.2, 2, '100g', ['cải thìa'], { 'head': 1.5, 'cup': 0.7 }),
+    createIng('mushroom', 22, 3.1, 0.3, 3.3, '100g', ['nấm', 'button mushroom'], { 'cup': 0.7 }),
+    createIng('shiitake', 34, 2.2, 0.5, 6.8, '100g', ['nấm hương'], { 'whole': 0.2 }),
+    createIng('zucchini', 17, 1.2, 0.3, 3.1, '100g', ['bí ngòi'], { 'medium': 1.96, 'cup': 1.2 }),
+    createIng('eggplant', 25, 1, 0.2, 6, '100g', ['cà tím'], { 'medium': 4.5, 'cup': 0.8 }),
+    createIng('corn', 86, 3.2, 1.2, 19, '100g', ['ngô', 'bắp'], { 'ear': 0.9, 'cup': 1.6 }),
+    createIng('green beans', 31, 1.8, 0.2, 7, '100g', ['đậu que'], { 'cup': 1.0 }),
+    createIng('peas', 81, 5, 0.4, 14, '100g', ['đậu hà lan'], { 'cup': 1.4 }),
+    createIng('asparagus', 20, 2.2, 0.1, 4, '100g', ['măng tây'], { 'spear': 0.2, 'bunch': 4.0 }),
+    createIng('celery', 16, 0.7, 0.2, 3, '100g', ['cần tây'], { 'stalk': 0.4, 'cup': 1.0 }),
+    createIng('ginger', 80, 1.8, 0.8, 18, '100g', ['gừng'], { 'thumb': 0.2, 'tsp': 0.02 }),
+    createIng('lemongrass', 99, 1.8, 0.5, 25, '100g', ['sả'], { 'stalk': 0.3 }),
+    createIng('bamboo shoots', 27, 2.6, 0.3, 5, '100g', ['măng'], { 'cup': 1.5 }),
+    createIng('bean sprouts', 30, 3, 0.2, 6, '100g', ['giá đỗ'], { 'cup': 0.9 }),
+
+    // =================================================================
+    // 2. TRÁI CÂY (FRUITS)
+    // =================================================================
+    createIng('apple', 52, 0.3, 0.2, 14, '100g', ['táo'], { 'medium': 1.8, 'cup': 1.1 }),
+    createIng('banana', 89, 1.1, 0.3, 23, '100g', ['chuối'], { 'medium': 1.2 }),
+    createIng('orange', 47, 0.9, 0.1, 12, '100g', ['cam'], { 'medium': 1.3 }),
+    createIng('lemon', 29, 1.1, 0.3, 9, '100g', ['chanh vàng'], { 'whole': 0.6, 'juice': 0.5 }),
+    createIng('lime', 30, 0.7, 0.2, 11, '100g', ['chanh xanh'], { 'whole': 0.6, 'juice': 0.4 }),
+    createIng('avocado', 160, 2, 15, 9, '100g', ['bơ'], { 'whole': 2.0, 'cup': 1.5 }),
+    createIng('strawberry', 32, 0.7, 0.3, 7.7, '100g', ['dâu tây'], { 'cup': 1.5 }),
+    createIng('blueberry', 57, 0.7, 0.3, 14, '100g', ['việt quất'], { 'cup': 1.5 }),
+    createIng('mango', 60, 0.8, 0.4, 15, '100g', ['xoài'], { 'whole': 3.3, 'cup': 1.6 }),
+    createIng('pineapple', 50, 0.5, 0.1, 13, '100g', ['dứa', 'thơm'], { 'cup': 1.6 }),
+    createIng('watermelon', 30, 0.6, 0.2, 8, '100g', ['dưa hấu'], { 'wedge': 2.8, 'cup': 1.5 }),
+    createIng('coconut', 354, 3.3, 33, 15, '100g', ['dừa'], { 'cup': 0.8 }),
+
+    // =================================================================
+    // 3. THỊT, CÁ & TRỨNG (PROTEINS)
+    // =================================================================
+    createIng('chicken breast', 165, 31, 3.6, 0, '100g', ['ức gà', 'thịt gà'], { 'breast': 2.0, 'cup': 1.4 }),
+    createIng('chicken thigh', 209, 26, 11, 0, '100g', ['đùi gà'], { 'thigh': 1.5 }),
+    createIng('chicken wings', 203, 30, 8, 0, '100g', ['cánh gà'], { 'wing': 0.9 }),
+    createIng('beef', 250, 26, 17, 0, '100g', ['thịt bò', 'ground beef'], { 'patty': 1.5, 'steak': 2.5 }),
+    createIng('pork', 242, 27, 14, 0, '100g', ['thịt heo', 'pork chop'], { 'chop': 1.5 }),
+    createIng('bacon', 541, 37, 42, 1.4, '100g', ['thịt xông khói'], { 'strip': 0.15, 'slice': 0.15 }),
+    createIng('sausage', 300, 12, 27, 2, '100g', ['xúc xích'], { 'link': 0.5 }),
+    createIng('salmon', 208, 20, 13, 0, '100g', ['cá hồi'], { 'fillet': 1.5 }),
+    createIng('tuna', 132, 28, 1, 0, '100g', ['cá ngừ'], { 'can': 1.5, 'steak': 1.7 }),
+    createIng('shrimp', 99, 24, 0.3, 0.2, '100g', ['tôm'], { 'piece': 0.15 }),
+    createIng('eggs', 155, 13, 11, 1.1, '100g', ['trứng gà'], { 'whole': 0.5, 'large': 0.5 }),
+    createIng('tofu', 76, 8, 4.8, 1.9, '100g', ['đậu phụ', 'bean curd'], { 'block': 3.0, 'piece': 0.5 }),
+    createIng('tempeh', 192, 20, 11, 8, '100g', ['tương nén'], { 'cup': 1.6 }),
+    createIng('lentils', 116, 9, 0.4, 20, '100g', ['đậu lăng'], { 'cup': 2.0 }),
+    createIng('chickpeas', 164, 9, 2.6, 27, '100g', ['đậu gà'], { 'cup': 1.6, 'can': 4.0 }),
+    createIng('black beans', 132, 9, 0.5, 24, '100g', ['đậu đen'], { 'cup': 1.7 }),
+
+    // =================================================================
+    // 4. SỮA & PHÔ MAI (DAIRY)
+    // =================================================================
+    createIng('milk', 42, 3.4, 1, 5, '100ml', ['sữa tươi'], { 'cup': 2.45, 'tbsp': 0.15 }),
+    createIng('yogurt', 59, 10, 0.4, 3.6, '100g', ['sữa chua'], { 'cup': 2.45, 'pot': 1.25 }),
+    createIng('butter', 717, 0.9, 81, 0.1, '100g', ['bơ lạt'], { 'stick': 1.13, 'tbsp': 0.14 }),
+    createIng('cheddar cheese', 403, 25, 33, 1.3, '100g', ['phô mai cheddar'], { 'slice': 0.28, 'cup': 1.1 }),
+    createIng('mozzarella', 280, 28, 17, 3.1, '100g', ['phô mai mozzarella'], { 'slice': 0.2, 'cup': 1.1 }),
+    createIng('parmesan', 431, 38, 29, 4.1, '100g', ['phô mai parmesan'], { 'tbsp': 0.05 }),
+    createIng('feta', 264, 14, 21, 4, '100g', ['phô mai feta'], { 'cup': 1.5, 'block': 2.0 }),
+    createIng('cream cheese', 342, 6, 34, 4, '100g', ['phô mai kem'], { 'tbsp': 0.15 }),
+    createIng('heavy cream', 340, 2.8, 36, 2.7, '100ml', ['kem tươi', 'whipping cream'], { 'cup': 2.4 }),
+    createIng('sour cream', 193, 2.1, 19, 2.9, '100g', ['kem chua'], { 'tbsp': 0.15 }),
+    createIng('coconut milk', 230, 2.3, 24, 6, '100ml', ['nước cốt dừa'], { 'cup': 2.4, 'can': 4.0 }),
+    createIng('almond milk', 15, 0.5, 1.1, 0.3, '100ml', ['sữa hạnh nhân'], { 'cup': 2.4 }),
+
+    // =================================================================
+    // 5. TINH BỘT & NGŨ CỐC (GRAINS & PASTA)
+    // =================================================================
+    createIng('rice', 130, 2.7, 0.3, 28, '100g', ['gạo', 'cơm'], { 'cup': 1.95, 'bowl': 2.0 }),
+    createIng('brown rice', 111, 2.6, 0.9, 23, '100g', ['gạo lứt'], { 'cup': 1.95 }),
+    createIng('quinoa', 120, 4.4, 1.9, 21, '100g', ['hạt diêm mạch'], { 'cup': 1.85 }),
+    createIng('oats', 389, 16.9, 6.9, 66, '100g', ['yến mạch'], { 'cup': 0.9 }),
+    createIng('pasta', 131, 5, 1.1, 25, '100g', ['mỳ ý', 'nui'], { 'cup': 1.4 }),
+    createIng('spaghetti', 371, 13, 1.5, 75, '100g', ['mỳ ý khô'], { 'serving': 0.8 }),
+    createIng('noodles', 138, 4.5, 2.1, 25, '100g', ['mỳ', 'phở'], { 'serving': 1.0 }),
+    createIng('bread', 265, 9, 3.2, 49, '100g', ['bánh mì'], { 'slice': 0.3, 'piece': 0.8 }),
+    createIng('tortilla', 218, 6, 3, 45, '100g', ['vỏ bánh'], { 'piece': 0.3 }),
+    createIng('flour', 364, 10, 1, 76, '100g', ['bột mì'], { 'cup': 1.25 }),
+
+    // =================================================================
+    // 6. GIA VỊ, SỐT & DẦU (PANTRY & CONDIMENTS)
+    // =================================================================
+    createIng('olive oil', 884, 0, 100, 0, '100ml', ['dầu oliu'], { 'tbsp': 0.14, 'tsp': 0.05 }),
+    createIng('vegetable oil', 884, 0, 100, 0, '100ml', ['dầu thực vật'], { 'tbsp': 0.14 }),
+    createIng('sesame oil', 884, 0, 100, 0, '100ml', ['dầu mè'], { 'tbsp': 0.14 }),
+    createIng('soy sauce', 53, 6, 0, 5, '100ml', ['nước tương'], { 'tbsp': 0.16 }),
+    createIng('fish sauce', 35, 5, 0, 3, '100ml', ['nước mắm'], { 'tbsp': 0.18 }),
+    createIng('vinegar', 18, 0, 0, 0.1, '100ml', ['giấm'], { 'tbsp': 0.15 }),
+    createIng('mayonnaise', 680, 1, 75, 1, '100g', ['sốt mayonnaise'], { 'tbsp': 0.14 }),
+    createIng('ketchup', 101, 1, 0, 27, '100g', ['tương cà'], { 'tbsp': 0.15 }),
+    createIng('mustard', 66, 4, 3, 6, '100g', ['mù tạt'], { 'tbsp': 0.15 }),
+    createIng('honey', 304, 0.3, 0, 82, '100g', ['mật ong'], { 'tbsp': 0.21, 'cup': 3.4 }),
+    createIng('sugar', 387, 0, 0, 100, '100g', ['đường'], { 'tbsp': 0.12, 'cup': 2.0 }),
+    createIng('salt', 0, 0, 0, 0, '100g', ['muối'], { 'tsp': 0.06 }),
+    createIng('black pepper', 251, 10, 3, 64, '100g', ['tiêu'], { 'tsp': 0.02 }),
+    createIng('peanut butter', 588, 25, 50, 20, '100g', ['bơ đậu phộng'], { 'tbsp': 0.16 }),
+
+    // =================================================================
+    // 7. HẠT & CÁC LOẠI KHÁC (NUTS & OTHERS)
+    // =================================================================
+    createIng('almonds', 579, 21, 50, 22, '100g', ['hạnh nhân'], { 'cup': 1.4 }),
+    createIng('walnuts', 654, 15, 65, 14, '100g', ['óc chó'], { 'cup': 1.2 }),
+    createIng('peanuts', 567, 26, 49, 16, '100g', ['đậu phộng'], { 'cup': 1.46 }),
+    createIng('chia seeds', 486, 17, 31, 42, '100g', ['hạt chia'], { 'tbsp': 0.1 }),
+    createIng('chocolate chips', 479, 4, 28, 63, '100g', ['socola chip'], { 'cup': 1.7 }),
+    createIng('cocoa powder', 228, 20, 14, 58, '100g', ['bột cacao'], { 'cup': 0.86 }),
+    createIng('vanilla extract', 288, 0, 0, 13, '100ml', ['vani'], { 'tsp': 0.04 }),
+    createIng('basil', 23, 3, 0.6, 2.7, '100g', ['húng quế'], { 'bunch': 0.5 }),
+    createIng('parsley', 36, 3, 0.8, 6, '100g', ['ngò tây'], { 'bunch': 0.5 }),
+    createIng('cilantro', 23, 2, 0.5, 3.7, '100g', ['ngò rí'], { 'bunch': 0.5 })
 ];
 
 const seedIngredientNutrition = async () => {
-  try {
-    await connectDB();
+    try {
+        await connectDB();
+        console.log('🔄 Bắt đầu nạp 150+ nguyên liệu (Upsert Mode)...');
 
-    // Clear existing data
-    await IngredientNutrition.deleteMany({});
-    console.log('✅ Cleared existing ingredient nutrition data');
+        const operations = ingredientNutritionData.map(item => ({
+            updateOne: {
+                filter: { name: item.name },
+                update: { $set: item },
+                upsert: true
+            }
+        }));
 
-    // Create ingredient nutrition data
-    const createdIngredients = await IngredientNutrition.create(ingredientNutritionData);
-    console.log(`✅ Created ${createdIngredients.length} ingredient nutrition records`);
+        if (operations.length > 0) {
+            const result = await IngredientNutrition.bulkWrite(operations);
+            console.log(` Thành công!`);
+            console.log(`   - Cập nhật/Thêm mới: ${result.upsertedCount + result.modifiedCount} nguyên liệu`);
+        }
 
-    console.log('\n📊 Sample Ingredients:');
-    createdIngredients.slice(0, 5).forEach(ing => {
-      console.log(`- ${ing.name}: ${ing.caloriesPerUnit} cal/${ing.standardUnit}`);
-    });
-
-    console.log('\n🎉 Ingredient nutrition database seeded successfully!');
-    process.exit(0);
-  } catch (error) {
-    console.error('❌ Error seeding ingredient nutrition database:', error);
-    process.exit(1);
-  }
+        console.log('Cơ sở dữ liệu dinh dưỡng đã sẵn sàng để tính toán!');
+        process.exit(0);
+    } catch (error) {
+        console.error('Lỗi:', error);
+        process.exit(1);
+    }
 };
 
 seedIngredientNutrition();
