@@ -1,12 +1,7 @@
 ﻿import nodemailer from 'nodemailer';
 
 const sendEmail = async (options) => {
-    // Debug log để xem cấu hình
-    console.log("=== DEBUG EMAIL CONFIG ===");
-    console.log("SMTP_EMAIL:", process.env.SMTP_EMAIL);
-
-    // CÁCH FIX MỚI: Dùng service: 'gmail' thay vì host/port thủ công
-    // Cách này giúp Nodemailer tự động xử lý các vấn đề về cổng và timeout
+    // 1. Tạo transporter với service 'gmail' (Tự động cấu hình cổng chuẩn nhất)
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -15,6 +10,7 @@ const sendEmail = async (options) => {
         },
     });
 
+    // 2. Cấu hình nội dung email
     const message = {
         from: `${process.env.SMTP_FROM_NAME} <${process.env.SMTP_EMAIL}>`,
         to: options.email,
@@ -22,8 +18,14 @@ const sendEmail = async (options) => {
         html: options.html,
     };
 
-    const info = await transporter.sendMail(message);
-    console.log("Message sent: %s", info.messageId);
+    // 3. Gửi email
+    try {
+        const info = await transporter.sendMail(message);
+        console.log("Email sent successfully via Gmail Service! MsgID:", info.messageId);
+    } catch (error) {
+        console.error("Email send failed:", error);
+        // Không throw error để tránh làm crash server nếu gửi mail lỗi
+    }
 };
 
 export default sendEmail;
