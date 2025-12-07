@@ -6,7 +6,7 @@
     "description": "RESTful API for the Mystere Meal recipe recommendation application. This API enables users to discover recipes based on available ingredients, manage personal favorites, submit new recipes, and interact with a community-driven platform featuring ratings, comments, and nutritional information.",
     "contact": {
       "name": "Mystere Meal Development Team",
-      "email": "support@mysteremeal.com"
+      "email": "mysteremeal.official@gmail.com"
     },
     "license": {
       "name": "MIT License",
@@ -52,7 +52,7 @@
   "paths": {
     "/users/signup": {
       "post": {
-        "tags": ["Authentication"],
+        "tags": [ "Authentication" ],
         "summary": "Register a new user account",
         "description": "Creates a new user account with email and password. Passwords are hashed using bcrypt before storage. Returns a JWT token for immediate authentication after successful registration.",
         "requestBody": {
@@ -61,7 +61,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["name", "email", "password"],
+                "required": [ "name", "email", "password" ],
                 "properties": {
                   "name": {
                     "type": "string",
@@ -121,7 +121,7 @@
     },
     "/users/login": {
       "post": {
-        "tags": ["Authentication"],
+        "tags": [ "Authentication" ],
         "summary": "User login",
         "description": "Authenticates a user with email and password. Returns a JWT token upon successful authentication. The token must be included in the Authorization header for protected endpoints.",
         "requestBody": {
@@ -130,7 +130,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email", "password"],
+                "required": [ "email", "password" ],
                 "properties": {
                   "email": {
                     "type": "string",
@@ -193,7 +193,7 @@
     },
     "/recipes/search": {
       "get": {
-        "tags": ["Recipes"],
+        "tags": [ "Recipes" ],
         "summary": "Search recipes by ingredients and filters",
         "description": "Advanced recipe search supporting multiple filters including ingredients, cuisine type, meal type, dietary restrictions, cooking time, and difficulty level. Results are sorted by number of matching ingredients when ingredient search is used.",
         "parameters": [
@@ -221,7 +221,7 @@
             "description": "Meal type filter",
             "schema": {
               "type": "string",
-              "enum": ["Breakfast", "Lunch", "Dinner", "Snack", "Dessert"],
+              "enum": [ "Breakfast", "Lunch", "Dinner", "Snack", "Dessert" ],
               "example": "Dinner"
             }
           },
@@ -231,7 +231,7 @@
             "description": "Cooking difficulty level",
             "schema": {
               "type": "string",
-              "enum": ["Easy", "Medium", "Hard"],
+              "enum": [ "Easy", "Medium", "Hard" ],
               "example": "Medium"
             }
           },
@@ -300,7 +300,7 @@
     },
     "/recipes/{id}": {
       "get": {
-        "tags": ["Recipes"],
+        "tags": [ "Recipes" ],
         "summary": "Get recipe details by ID",
         "description": "Retrieves complete recipe information including ingredients, steps, nutrition facts, comments, and ratings. Recipe must have 'approved' status to be visible to non-admin users.",
         "parameters": [
@@ -339,10 +339,10 @@
         }
       },
       "put": {
-        "tags": ["Recipes"],
+        "tags": [ "Recipes" ],
         "summary": "Update recipe",
         "description": "Updates recipe information. Only the recipe author can update their own recipes. Admin users can update any recipe.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "id",
@@ -387,10 +387,10 @@
         }
       },
       "delete": {
-        "tags": ["Recipes"],
+        "tags": [ "Recipes" ],
         "summary": "Delete recipe",
         "description": "Permanently deletes a recipe. Only the recipe author can delete their own recipes. Admin users can delete any recipe.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "id",
@@ -433,10 +433,10 @@
     },
     "/recipes": {
       "post": {
-        "tags": ["Recipes"],
+        "tags": [ "Recipes" ],
         "summary": "Create new recipe",
         "description": "Creates a new recipe. Requires authentication. New recipes are set to 'pending' status by default and require admin approval before being publicly visible.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "requestBody": {
           "required": true,
           "content": {
@@ -469,10 +469,10 @@
     },
     "/recipes/{id}/comments": {
       "post": {
-        "tags": ["Recipes"],
+        "tags": [ "Recipes" ],
         "summary": "Add comment and rating to recipe",
         "description": "Adds a user comment and rating (1-5 stars) to a recipe. The recipe's average rating is automatically recalculated after each comment. Requires authentication.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "id",
@@ -490,7 +490,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["text", "rating"],
+                "required": [ "text", "rating" ],
                 "properties": {
                   "text": {
                     "type": "string",
@@ -535,10 +535,10 @@
     },
     "/users/{id}/favorites": {
       "get": {
-        "tags": ["User Profile"],
+        "tags": [ "User Profile" ],
         "summary": "Get user's favorite recipes",
         "description": "Retrieves all recipes marked as favorites by the user. Requires authentication. Users can only access their own favorites.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "id",
@@ -573,10 +573,10 @@
         }
       },
       "post": {
-        "tags": ["User Profile"],
+        "tags": [ "User Profile" ],
         "summary": "Add recipe to favorites",
         "description": "Adds a recipe to the user's favorites list. Requires authentication. Users can only modify their own favorites.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "id",
@@ -594,7 +594,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["recipeId"],
+                "required": [ "recipeId" ],
                 "properties": {
                   "recipeId": {
                     "type": "string",
@@ -637,10 +637,10 @@
     },
     "/users/{id}/favorites/{recipeId}": {
       "delete": {
-        "tags": ["User Profile"],
+        "tags": [ "User Profile" ],
         "summary": "Remove recipe from favorites",
         "description": "Removes a recipe from the user's favorites list. Requires authentication.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "id",
@@ -689,10 +689,10 @@
     },
     "/users/{id}/recipes": {
       "get": {
-        "tags": ["User Profile"],
+        "tags": [ "User Profile" ],
         "summary": "Get recipes created by user",
         "description": "Retrieves all recipes created by a specific user. Requires authentication.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "id",
@@ -726,10 +726,10 @@
     },
     "/admin/recipes": {
       "get": {
-        "tags": ["Admin"],
+        "tags": [ "Admin" ],
         "summary": "Get recipes by approval status",
         "description": "Retrieves recipes filtered by approval status (pending, approved, rejected). Requires admin role. Used for recipe moderation workflow.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "status",
@@ -737,7 +737,7 @@
             "description": "Recipe approval status filter",
             "schema": {
               "type": "string",
-              "enum": ["pending", "approved", "rejected"],
+              "enum": [ "pending", "approved", "rejected" ],
               "default": "pending"
             }
           }
@@ -767,10 +767,10 @@
     },
     "/admin/recipes/{id}/approve": {
       "post": {
-        "tags": ["Admin"],
+        "tags": [ "Admin" ],
         "summary": "Approve pending recipe",
         "description": "Approves a pending recipe, making it publicly visible. Requires admin role.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "id",
@@ -807,10 +807,10 @@
     },
     "/admin/recipes/{id}/reject": {
       "post": {
-        "tags": ["Admin"],
+        "tags": [ "Admin" ],
         "summary": "Reject pending recipe",
         "description": "Rejects a pending recipe, preventing it from being publicly visible. Requires admin role.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "id",
@@ -847,10 +847,10 @@
     },
     "/admin/recipes/{id}": {
       "delete": {
-        "tags": ["Admin"],
+        "tags": [ "Admin" ],
         "summary": "Delete recipe (admin)",
         "description": "Permanently deletes any recipe regardless of owner. Requires admin role. Use with caution.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "id",
@@ -893,10 +893,10 @@
     },
     "/admin/users": {
       "get": {
-        "tags": ["Admin"],
+        "tags": [ "Admin" ],
         "summary": "Get all users",
         "description": "Retrieves a list of all registered users. Requires admin role. Used for user management and moderation.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "responses": {
           "200": {
             "description": "List of all users",
@@ -922,10 +922,10 @@
     },
     "/admin/users/{id}/lock": {
       "post": {
-        "tags": ["Admin"],
+        "tags": [ "Admin" ],
         "summary": "Lock user account",
         "description": "Locks a user account, preventing login and access to protected resources. Requires admin role. Used for user moderation.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "id",
@@ -971,10 +971,10 @@
     },
     "/admin/users/{id}/unlock": {
       "post": {
-        "tags": ["Admin"],
+        "tags": [ "Admin" ],
         "summary": "Unlock user account",
         "description": "Unlocks a previously locked user account, restoring login and access privileges. Requires admin role.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "id",
@@ -1020,7 +1020,7 @@
     },
     "/ingredients/nutrition": {
       "get": {
-        "tags": ["Ingredient Nutrition"],
+        "tags": [ "Ingredient Nutrition" ],
         "summary": "Get all ingredient nutritional data",
         "description": "Retrieves complete nutritional information for all ingredients in the database. Contains 70+ common ingredients with calories, protein, fat, and carbohydrates per standard unit.",
         "responses": {
@@ -1040,10 +1040,10 @@
         }
       },
       "post": {
-        "tags": ["Ingredient Nutrition"],
+        "tags": [ "Ingredient Nutrition" ],
         "summary": "Add new ingredient nutrition data",
         "description": "Creates a new ingredient nutritional entry. Requires authentication. Used for expanding the nutrition database.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1076,7 +1076,7 @@
     },
     "/ingredients/nutrition/calculate": {
       "post": {
-        "tags": ["Ingredient Nutrition"],
+        "tags": [ "Ingredient Nutrition" ],
         "summary": "Calculate total nutrition for recipe",
         "description": "Calculates the total nutritional value (calories, protein, fat, carbs) for a recipe based on its ingredients and quantities. Automatically matches ingredient names and applies quantity conversions.",
         "requestBody": {
@@ -1085,14 +1085,14 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["ingredients"],
+                "required": [ "ingredients" ],
                 "properties": {
                   "ingredients": {
                     "type": "array",
                     "description": "List of recipe ingredients with quantities",
                     "items": {
                       "type": "object",
-                      "required": ["name", "quantity", "unit"],
+                      "required": [ "name", "quantity", "unit" ],
                       "properties": {
                         "name": {
                           "type": "string",
@@ -1163,10 +1163,10 @@
     },
     "/shopping-list": {
       "get": {
-        "tags": ["Shopping List"],
+        "tags": [ "Shopping List" ],
         "summary": "Get user's shopping list",
         "description": "Retrieves the authenticated user's shopping list with all items. Each user has one shopping list that persists across sessions.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "responses": {
           "200": {
             "description": "Shopping list retrieved successfully",
@@ -1189,17 +1189,17 @@
     },
     "/shopping-list/items": {
       "post": {
-        "tags": ["Shopping List"],
+        "tags": [ "Shopping List" ],
         "summary": "Add item to shopping list",
         "description": "Adds a new item to the user's shopping list. Items can be added manually or linked to recipes for tracking ingredient sources.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["name", "quantity", "unit"],
+                "required": [ "name", "quantity", "unit" ],
                 "properties": {
                   "name": {
                     "type": "string",
@@ -1248,10 +1248,10 @@
     },
     "/shopping-list/items/{itemId}": {
       "delete": {
-        "tags": ["Shopping List"],
+        "tags": [ "Shopping List" ],
         "summary": "Remove item from shopping list",
         "description": "Removes a specific item from the user's shopping list by item ID.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "itemId",
@@ -1285,10 +1285,10 @@
     },
     "/shopping-list/items/{itemId}/toggle": {
       "patch": {
-        "tags": ["Shopping List"],
+        "tags": [ "Shopping List" ],
         "summary": "Toggle item checked status",
         "description": "Toggles the checked/unchecked status of a shopping list item. Used to mark items as purchased or needed.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "parameters": [
           {
             "name": "itemId",
@@ -1322,10 +1322,10 @@
     },
     "/shopping-list/clear-completed": {
       "delete": {
-        "tags": ["Shopping List"],
+        "tags": [ "Shopping List" ],
         "summary": "Clear all checked items",
         "description": "Removes all checked/completed items from the shopping list. Useful for clearing purchased items after shopping.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "responses": {
           "200": {
             "description": "Completed items cleared successfully",
@@ -1345,17 +1345,17 @@
     },
     "/shopping-list/add-from-recipe": {
       "post": {
-        "tags": ["Shopping List"],
+        "tags": [ "Shopping List" ],
         "summary": "Add recipe ingredients to shopping list",
         "description": "Automatically adds all missing ingredients from a recipe to the user's shopping list. Useful for meal planning and shopping preparation.",
-        "security": [{"BearerAuth": []}],
+        "security": [ { "BearerAuth": [] } ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["recipeId"],
+                "required": [ "recipeId" ],
                 "properties": {
                   "recipeId": {
                     "type": "string",
@@ -1483,13 +1483,13 @@
           "mealType": {
             "type": "string",
             "description": "Meal type category",
-            "enum": ["Breakfast", "Lunch", "Dinner", "Snack", "Dessert"],
+            "enum": [ "Breakfast", "Lunch", "Dinner", "Snack", "Dessert" ],
             "example": "Dinner"
           },
           "difficulty": {
             "type": "string",
             "description": "Cooking difficulty level",
-            "enum": ["Easy", "Medium", "Hard"],
+            "enum": [ "Easy", "Medium", "Hard" ],
             "example": "Medium"
           },
           "time": {
@@ -1534,7 +1534,7 @@
             "items": {
               "type": "string"
             },
-            "example": ["Boil pasta in salted water", "Cook bacon until crispy", "Mix eggs with cheese", "Combine all ingredients"]
+            "example": [ "Boil pasta in salted water", "Cook bacon until crispy", "Mix eggs with cheese", "Combine all ingredients" ]
           },
           "tags": {
             "type": "array",
@@ -1542,7 +1542,7 @@
             "items": {
               "type": "string"
             },
-            "example": ["comfort-food", "quick-meal", "family-friendly"]
+            "example": [ "comfort-food", "quick-meal", "family-friendly" ]
           },
           "isVegetarian": {
             "type": "boolean",
@@ -1593,7 +1593,7 @@
           "status": {
             "type": "string",
             "description": "Recipe approval status (admin moderation)",
-            "enum": ["pending", "approved", "rejected"],
+            "enum": [ "pending", "approved", "rejected" ],
             "example": "approved"
           },
           "author": {
@@ -1652,7 +1652,7 @@
       "RecipeInput": {
         "type": "object",
         "description": "Recipe creation/update input schema",
-        "required": ["title", "cuisine", "mealType", "difficulty", "time", "ingredients", "steps"],
+        "required": [ "title", "cuisine", "mealType", "difficulty", "time", "ingredients", "steps" ],
         "properties": {
           "title": {
             "type": "string",
@@ -1678,12 +1678,12 @@
           },
           "mealType": {
             "type": "string",
-            "enum": ["Breakfast", "Lunch", "Dinner", "Snack", "Dessert"],
+            "enum": [ "Breakfast", "Lunch", "Dinner", "Snack", "Dessert" ],
             "example": "Dinner"
           },
           "difficulty": {
             "type": "string",
-            "enum": ["Easy", "Medium", "Hard"],
+            "enum": [ "Easy", "Medium", "Hard" ],
             "example": "Medium"
           },
           "time": {
@@ -1703,7 +1703,7 @@
             "minItems": 1,
             "items": {
               "type": "object",
-              "required": ["name", "quantity", "unit"],
+              "required": [ "name", "quantity", "unit" ],
               "properties": {
                 "name": {
                   "type": "string",
@@ -1729,14 +1729,14 @@
               "type": "string",
               "minLength": 10
             },
-            "example": ["Boil pasta in salted water for 8-10 minutes", "Cook bacon until crispy", "Mix eggs with grated cheese", "Combine all ingredients and serve hot"]
+            "example": [ "Boil pasta in salted water for 8-10 minutes", "Cook bacon until crispy", "Mix eggs with grated cheese", "Combine all ingredients and serve hot" ]
           },
           "tags": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "example": ["comfort-food", "quick"]
+            "example": [ "comfort-food", "quick" ]
           },
           "isVegetarian": {
             "type": "boolean",
@@ -1866,7 +1866,7 @@
       "IngredientNutritionInput": {
         "type": "object",
         "description": "Input schema for creating ingredient nutrition data",
-        "required": ["name", "caloriesPerUnit", "proteinPerUnit", "fatPerUnit", "carbsPerUnit"],
+        "required": [ "name", "caloriesPerUnit", "proteinPerUnit", "fatPerUnit", "carbsPerUnit" ],
         "properties": {
           "name": {
             "type": "string",

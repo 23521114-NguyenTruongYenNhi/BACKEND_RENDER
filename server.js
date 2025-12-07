@@ -99,6 +99,14 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
+app.get('/api', (req, res) => {
+    res.json({
+        message: 'Welcome to the Mystère Meal API Base Path',
+        documentation: '/api-docs',
+        status: 'Routes are correctly mounted under this prefix.'
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
