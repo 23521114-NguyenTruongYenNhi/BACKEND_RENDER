@@ -35,12 +35,8 @@ const app = express();
 app.use(cors({
     origin: [
         'http://localhost:5173',
-        'https://mystere-meal-frontend.vercel.app',
-        'https://mystere-meal-frontend-ow6lbi1yv.vercel.app',
         /https:\/\/mystere-meal-frontend.*\.vercel\.app/,
-        'https://frontend-final-gamma.vercel.app',
-        'https://frontend-final-deploy-delta.vercel.app',
-        'https://mysteremeal.vercel.app/'
+        'https://mysteremeal.vercel.app'
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
