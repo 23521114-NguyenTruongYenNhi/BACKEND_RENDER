@@ -39,7 +39,8 @@ app.use(cors({
         'https://mystere-meal-frontend-ow6lbi1yv.vercel.app',
         /https:\/\/mystere-meal-frontend.*\.vercel\.app/,
         'https://frontend-final-gamma.vercel.app',
-        'https://frontend-final-deploy-delta.vercel.app'
+        'https://frontend-final-deploy-delta.vercel.app',
+        'https://mysteremeal.vercel.app/'
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

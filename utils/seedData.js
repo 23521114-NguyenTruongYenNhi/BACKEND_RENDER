@@ -7,7 +7,7 @@ import Comment from '../models/Comment.js';
 dotenv.config();
 
 // Link Database của bạn
-
+const MONGODB_URI = process.env.MONGODB_URI;
 const recipesData = [
     // =================================================================
     // 1. VIETNAMESE CUISINE
@@ -30,7 +30,7 @@ const recipesData = [
     },
     {
         title: 'Banh Mi Grilled Pork',
-        image: 'https://images.unsplash.com/photo-1635586634892-e42d765b9347?auto=format&fit=crop&w=800&q=80',
+        image: 'https://assets.wsimgs.com/wsimgs/ab/images/dp/recipe/202519/0001/img6l.jpg',
         cuisine: 'Vietnamese', mealType: 'Lunch', difficulty: 'Medium', time: 30, rating: 4.8,
         ingredients: ['bread', 'pork', 'cucumber', 'carrot', 'cilantro', 'mayonnaise', 'soy sauce', 'lemongrass'],
         steps: [
@@ -46,7 +46,7 @@ const recipesData = [
     },
     {
         title: 'Fresh Summer Rolls',
-        image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80',
+        image: 'https://images.unsplash.com/photo-1618406854423-ef169758d6a6?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHNwcmluZyUyMHJvbGx8ZW58MHx8MHx8fDA%3D',
         cuisine: 'Vietnamese', mealType: 'Snack', difficulty: 'Medium', time: 40, rating: 4.7,
         ingredients: ['shrimp', 'pork', 'rice noodles', 'lettuce', 'cucumber', 'hoisin sauce', 'peanuts'],
         steps: [
@@ -62,7 +62,7 @@ const recipesData = [
     },
     {
         title: 'Bun Cha Hanoi',
-        image: 'https://images.unsplash.com/photo-1595304958123-c97779919456?auto=format&fit=crop&w=800&q=80',
+        image: 'https://i1-giadinh.vnecdn.net/2023/04/16/Buoc-11-Thanh-pham-11-7068-1681636164.jpg?w=1020&h=0&q=100&dpr=1&fit=crop&s=3BwD1Zud1vWE1jRJYrvvmw',
         cuisine: 'Vietnamese', mealType: 'Lunch', difficulty: 'Medium', time: 60, rating: 4.9,
         ingredients: ['pork', 'rice noodles', 'fish sauce', 'sugar', 'garlic', 'carrot', 'papaya'],
         steps: [
@@ -77,7 +77,7 @@ const recipesData = [
     },
     {
         title: 'Vietnamese Beef Stew (Bo Kho)',
-        image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80',
+        image: 'https://hstatic.net/759/1000071759/1/2016/2-22/141279324198855_slide___1__master.jpg',
         cuisine: 'Vietnamese', mealType: 'Dinner', difficulty: 'Hard', time: 120, rating: 4.7,
         ingredients: ['beef', 'carrot', 'lemongrass', 'star anise', 'bread', 'coconut milk'],
         steps: [
@@ -128,7 +128,7 @@ const recipesData = [
     },
     {
         title: 'Beef Lasagna',
-        image: 'https://images.unsplash.com/photo-1574868235275-f09b581b0460?auto=format&fit=crop&w=800&q=80',
+        image: 'https://asset.slimmingworld.co.uk/content/media/21057/lasagne-campaign-recipe.jpg?v1=JGXiore20qg9NNIj0tmc3TKfKw-jr0s127JqqpCA2x7sMviNgcAYh1epuS_Lqxebn9V_qusKHfwbF7MOUrAPptzBhXIUL1Xnq2Mmdvx4fOk&width=640&height=640',
         cuisine: 'Italian', mealType: 'Dinner', difficulty: 'Hard', time: 90, rating: 4.9,
         ingredients: ['beef', 'tomato', 'flour', 'milk', 'mozzarella', 'parmesan', 'pasta'],
         steps: [
@@ -158,7 +158,7 @@ const recipesData = [
     },
     {
         title: 'Caprese Salad',
-        image: 'https://images.unsplash.com/photo-1529312266912-b33cf6227e2f?auto=format&fit=crop&w=800&q=80',
+        image: 'https://i2.wp.com/www.downshiftology.com/wp-content/uploads/2019/07/Caprese-Salad-main-1.jpg',
         cuisine: 'Italian', mealType: 'Snack', difficulty: 'Easy', time: 10, rating: 4.5,
         ingredients: ['tomato', 'mozzarella', 'basil', 'olive oil', 'balsamic vinegar'],
         steps: [
@@ -271,7 +271,7 @@ const recipesData = [
     },
     {
         title: 'Miso Soup',
-        image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80',
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4TgpyYb4qz7LAJybB917Qu2KfCk5NC4DF8Ybu0JFX1HNFpY41u6gNvdcYO0T_eT5yD7NEMxFbPty78Cf0PgJrVCtzgLoI6JYAsaOilm4e&s=10',
         cuisine: 'Japanese', mealType: 'Breakfast', difficulty: 'Easy', time: 15, rating: 4.5,
         ingredients: ['tofu', 'miso paste', 'seaweed', 'spring onion'],
         steps: [
@@ -285,7 +285,7 @@ const recipesData = [
     },
     {
         title: 'Chicken Teriyaki',
-        image: 'https://images.unsplash.com/photo-1610057099443-fde8c4d29f29?auto=format&fit=crop&w=800&q=80',
+        image: 'https://images.unsplash.com/photo-1609183480237-ccbb2d7c5772?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2hpY2tlbiUyMHRlcml5YWtpfGVufDB8fDB8fHww',
         cuisine: 'Japanese', mealType: 'Dinner', difficulty: 'Medium', time: 30, rating: 4.7,
         ingredients: ['chicken', 'soy sauce', 'sugar', 'ginger', 'rice'],
         steps: [
@@ -299,7 +299,7 @@ const recipesData = [
     },
     {
         title: 'Shrimp Tempura',
-        image: 'https://images.unsplash.com/photo-1615486767794-4b70a80d882d?auto=format&fit=crop&w=800&q=80',
+        image: 'https://images.unsplash.com/photo-1600019229369-ef34b8700b3f?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fFNocmltcCUyMFRlbXB1cmF8ZW58MHx8MHx8fDA%3D',
         cuisine: 'Japanese', mealType: 'Lunch', difficulty: 'Medium', time: 40, rating: 4.6,
         ingredients: ['shrimp', 'flour', 'eggs', 'oil'],
         steps: [
@@ -314,7 +314,7 @@ const recipesData = [
     },
     {
         title: 'Shoyu Ramen',
-        image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80',
+        image: 'https://static01.nyt.com/images/2024/01/10/multimedia/ND-Shoyu-Ramen-qflv/ND-Shoyu-Ramen-qflv-mediumSquareAt3X.jpg',
         cuisine: 'Japanese', mealType: 'Dinner', difficulty: 'Hard', time: 120, rating: 4.8,
         ingredients: ['noodles', 'pork', 'eggs', 'soy sauce', 'spring onion'],
         steps: [
@@ -363,7 +363,7 @@ const recipesData = [
     },
     {
         title: 'Mango Sticky Rice',
-        image: 'https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80',
+        image: 'https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480_1_5x/img/recipe/ras/Assets/db5ef13f0825b81a5445ae9d30b97ed6/Derivates/dc31adf30cce05a9f858beccb77038d992175aa6.jpg',
         cuisine: 'Thai', mealType: 'Dessert', difficulty: 'Medium', time: 40, rating: 4.9,
         ingredients: ['rice', 'mango', 'coconut milk', 'sugar'],
         steps: [
@@ -377,7 +377,7 @@ const recipesData = [
     },
     {
         title: 'Tom Yum Soup',
-        image: 'https://images.unsplash.com/photo-1548943487-a2e4e43b485c?auto=format&fit=crop&w=800&q=80',
+        image: 'http://thai-foodie.com/wp-content/uploads/2025/02/chicken-tom-yum-soup-bowl.jpg',
         cuisine: 'Thai', mealType: 'Dinner', difficulty: 'Medium', time: 30, rating: 4.7,
         ingredients: ['shrimp', 'mushroom', 'lemongrass', 'lime', 'chili paste'],
         steps: [
@@ -392,7 +392,7 @@ const recipesData = [
     },
     {
         title: 'Papaya Salad (Som Tum)',
-        image: 'https://images.unsplash.com/photo-1626804475315-1874d1732698?auto=format&fit=crop&w=800&q=80',
+        image: 'https://images.pexels.com/photos/19902301/pexels-photo-19902301.jpeg?_gl=1*1qg61we*_ga*MjAxNjA2NTU4Ny4xNzY0NzU2NzM5*_ga_8JE65Q40S6*czE3NjUxMjcyMjckbzQkZzEkdDE3NjUxMjcyNDkkajM4JGwwJGgw',
         cuisine: 'Thai', mealType: 'Lunch', difficulty: 'Easy', time: 20, rating: 4.6,
         ingredients: ['papaya', 'tomato', 'lime', 'fish sauce', 'peanuts'],
         steps: [
@@ -488,7 +488,7 @@ const recipesData = [
     // =================================================================
     {
         title: 'Beef Tacos',
-        image: 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&w=800&q=80',
+        image: 'https://images.pexels.com/photos/9213983/pexels-photo-9213983.jpeg?_gl=1*kzfenv*_ga*MjAxNjA2NTU4Ny4xNzY0NzU2NzM5*_ga_8JE65Q40S6*czE3NjUxMjcyMjckbzQkZzEkdDE3NjUxMjczMTkkajU5JGwwJGgw',
         cuisine: 'Mexican', mealType: 'Dinner', difficulty: 'Easy', time: 25, rating: 4.7,
         ingredients: ['beef', 'tortilla', 'onion', 'cilantro', 'lime'],
         steps: [
@@ -503,7 +503,7 @@ const recipesData = [
     },
     {
         title: 'Guacamole',
-        image: 'https://images.unsplash.com/photo-1574315042621-503463a53444?auto=format&fit=crop&w=800&q=80',
+        image: 'https://plus.unsplash.com/premium_photo-1681406689557-e09522dda8d3?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         cuisine: 'Mexican', mealType: 'Snack', difficulty: 'Easy', time: 10, rating: 4.8,
         ingredients: ['avocado', 'onion', 'tomato', 'lime', 'cilantro'],
         steps: [
@@ -531,7 +531,7 @@ const recipesData = [
     },
     {
         title: 'Burrito Bowl',
-        image: 'https://images.unsplash.com/photo-1543353071-873f17a7a088?auto=format&fit=crop&w=800&q=80',
+        image: 'https://i0.wp.com/kjsfoodjournal.com/wp-content/uploads/2022/08/img_4393-scaled-e1660820401657.jpg?fit=919%2C1200&ssl=1',
         cuisine: 'Mexican', mealType: 'Lunch', difficulty: 'Easy', time: 25, rating: 4.7,
         ingredients: ['rice', 'black beans', 'corn', 'chicken', 'salsa'],
         steps: [
@@ -564,7 +564,7 @@ const recipesData = [
     // =================================================================
     {
         title: 'Yangzhou Fried Rice',
-        image: 'https://images.unsplash.com/photo-1603133872878-684f1084261d?auto=format&fit=crop&w=800&q=80',
+        image: 'https://tamingofthespoon.com/wp-content/uploads/2023/09/Truffle-Fried-Rice-R2-2.jpg',
         cuisine: 'Chinese', mealType: 'Dinner', difficulty: 'Easy', time: 20, rating: 4.5,
         ingredients: ['rice', 'eggs', 'pork', 'shrimp', 'peas', 'soy sauce'],
         steps: [
@@ -593,8 +593,12 @@ const recipesData = [
     },
     {
         title: 'Stir-Fried Veggies',
-        image: 'https://images.unsplash.com/photo-1527056456075-8ceda0498704?auto=format&fit=crop&w=800&q=80',
-        cuisine: 'Chinese', mealType: 'Dinner', difficulty: 'Easy', time: 15, rating: 4.4,
+        image: 'https://natashaskitchen.com/wp-content/uploads/2020/08/Vegetable-Stir-Fry-2-1.jpg',
+        cuisine: 'Chinese',
+        mealType: 'Dinner',
+        difficulty: 'Easy',
+        time: 15,
+        rating: 4.4,
         ingredients: ['broccoli', 'carrot', 'garlic', 'soy sauce', 'oyster sauce'],
         steps: [
             'Blanch: Briefly boil broccoli and carrots, then drain.',
@@ -604,11 +608,12 @@ const recipesData = [
             'Serve: Serve hot as a side dish.'
         ],
         nutrition: { calories: 150, protein: 5, fat: 8, carbs: 15 },
-        tags: ['Vegetarian', 'Healthy'], isVegetarian: true
+        tags: ['Vegetarian', 'Healthy'],
+        isVegetarian: true
     },
     {
         title: 'Wonton Soup',
-        image: 'https://images.unsplash.com/photo-1596560548464-f010549b84d7?auto=format&fit=crop&w=800&q=80',
+        image: 'https://iamhomesteader.com/wp-content/uploads/2022/03/wonton-soup-1-1022x1024.jpg',
         cuisine: 'Chinese', mealType: 'Dinner', difficulty: 'Medium', time: 40, rating: 4.6,
         ingredients: ['pork', 'shrimp', 'flour', 'stock'],
         steps: [
@@ -623,7 +628,7 @@ const recipesData = [
     },
     {
         title: 'Sweet and Sour Pork',
-        image: 'https://images.unsplash.com/photo-1593560708920-638928ce7126?auto=format&fit=crop&w=800&q=80',
+        image: 'https://images.getrecipekit.com/20221126192739-sweet-and-sour-pork.png?aspect_ratio=16:9&quality=90&',
         cuisine: 'Chinese', mealType: 'Dinner', difficulty: 'Medium', time: 40, rating: 4.5,
         ingredients: ['pork', 'pineapple', 'bell pepper', 'vinegar', 'sugar', 'ketchup'],
         steps: [
@@ -670,7 +675,7 @@ const recipesData = [
     },
     {
         title: 'Crepes',
-        image: 'https://images.unsplash.com/photo-1519676867240-f03562e64548?auto=format&fit=crop&w=800&q=80',
+        image: 'https://www.allrecipes.com/thmb/FcCzYFLfK5Rcmi9LsFVMk_m-5JQ=/0x512/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/16383-basic-crepes-VAT-008-3x2-e9333133915a4315ab3716bc17ecf16d.jpg',
         cuisine: 'French', mealType: 'Dessert', difficulty: 'Medium', time: 30, rating: 4.8,
         ingredients: ['flour', 'milk', 'eggs', 'butter', 'sugar'],
         steps: [
@@ -684,7 +689,7 @@ const recipesData = [
     },
     {
         title: 'Onion Soup',
-        image: 'https://images.unsplash.com/photo-1608500218860-63959c991e23?auto=format&fit=crop&w=800&q=80',
+        image: 'https://www.familyfoodonthetable.com/wp-content/uploads/2025/01/French-Onion-Soup-13.jpg',
         cuisine: 'French', mealType: 'Dinner', difficulty: 'Medium', time: 60, rating: 4.7,
         ingredients: ['onion', 'beef', 'bread', 'cheese'],
         steps: [
@@ -698,7 +703,7 @@ const recipesData = [
     },
     {
         title: 'Quiche Lorraine',
-        image: 'https://images.unsplash.com/photo-1612182062633-9524ca86c5dc?auto=format&fit=crop&w=800&q=80',
+        image: 'https://www.southernliving.com/thmb/9r8qo-qOdXWN4651I7kpMhBWLDA=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/28144_OE_QuicheLorraine_206-5d276f426faa4154ba91b72e225c8d45.jpg',
         cuisine: 'French', mealType: 'Lunch', difficulty: 'Medium', time: 60, rating: 4.6,
         ingredients: ['eggs', 'heavy cream', 'bacon', 'flour', 'cheese'],
         steps: [
@@ -730,7 +735,7 @@ const recipesData = [
     },
     {
         title: 'Chicken Souvlaki',
-        image: 'https://images.unsplash.com/photo-1532635270-c09dac425ca9?auto=format&fit=crop&w=800&q=80',
+        image: 'https://www.tablefortwoblog.com/wp-content/uploads/2023/04/greek-chicken-souvlaki-recipe-photo-tablefortwoblog-7.jpg',
         cuisine: 'Greek', mealType: 'Dinner', difficulty: 'Medium', time: 30, rating: 4.7,
         ingredients: ['chicken', 'lemon', 'oregano', 'yogurt'],
         steps: [
@@ -748,7 +753,7 @@ const recipesData = [
     // =================================================================
     {
         title: 'Oatmeal with Berries',
-        image: 'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=800&q=80',
+        image: 'https://www.pcrm.org/sites/default/files/Oatmeal%20and%20Berries.jpg',
         cuisine: 'American', mealType: 'Breakfast', difficulty: 'Easy', time: 10, rating: 4.5,
         ingredients: ['oats', 'milk', 'banana', 'strawberry'],
         steps: [
@@ -774,7 +779,7 @@ const recipesData = [
     },
     {
         title: 'Grilled Salmon',
-        image: 'https://images.unsplash.com/photo-1467003909585-2f8a7270028d?auto=format&fit=crop&w=800&q=80',
+        image: 'https://www.aussiemeat.hk/cdn/shop/articles/24xxxx-Recipes-Shopify1080_520x500_085eff37-c277-4b67-88d2-f9bf22f147cf_500x500.png?v=1750237761',
         cuisine: 'International', mealType: 'Dinner', difficulty: 'Medium', time: 20, rating: 4.9,
         ingredients: ['salmon', 'asparagus', 'lemon', 'butter'],
         steps: [
@@ -792,12 +797,12 @@ const recipesData = [
 // --- MAIN SEED FUNCTION ---
 const seedDB = async () => {
     try {
-        await mongoose.connect(MONGO_URI);
-        console.log('✅ MongoDB Connected');
+        await mongoose.connect(MONGODB_URI);
+        console.log('MongoDB Connected');
 
         // 1. DELETE OLD RECIPES
         await Recipe.deleteMany({});
-        console.log('✅ Đã xóa sạch công thức cũ.');
+        console.log('Đã xóa sạch công thức cũ.');
 
         // 2. CREATE ADMIN
         let user = await User.findOne({ email: 'admin@mysteremeal.com' });
