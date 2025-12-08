@@ -15,10 +15,6 @@
   },
   "servers": [
     {
-      "url": "http://localhost:5000/api",
-      "description": "Local development server"
-    },
-    {
       "url": "https://mystere-meal.onrender.com/api",
       "description": "Production server"
     }
